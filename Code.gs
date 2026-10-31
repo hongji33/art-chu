@@ -137,7 +137,7 @@ function txt_(s, max, required) {
 function checkShapes_(a) {
   if (!Array.isArray(a) || a.length < 1 || a.length > 150) throw new Error('invalid');
   const s = JSON.stringify(a);
-  if (s.length > 40000) throw new Error('invalid');
+  if (s.length > 48000) throw new Error('invalid');
   return a;
 }
 function checkTags_(a) { return (Array.isArray(a) ? a : []).map(String).slice(0, 6); }

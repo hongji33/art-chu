@@ -111,8 +111,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .lib-group+.lib-group{margin-top:14px}
 .lib-group h3{font-size:12px;color:var(--muted);font-weight:500;letter-spacing:.12em;margin-bottom:6px}
 .lib-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.tile{aspect-ratio:1;background:#1a1920;border:1px solid var(--line);border-radius:8px;display:grid;place-items:center;padding:6px;touch-action:none;user-select:none;position:relative}
-.tile:hover{border-color:var(--gold);background:#201e27}
+.tile{aspect-ratio:1;background:var(--ivory);border:2px solid transparent;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);border-radius:8px;display:grid;place-items:center;padding:6px;touch-action:none;user-select:none;position:relative}
+.tile:hover{border-color:var(--gold-hi);background:#fffaf0}
 .tile svg{width:100%;height:100%;pointer-events:none}
 .tile .tip{position:absolute;inset:auto 0 -2px;font-size:10px;color:var(--muted);text-align:center;pointer-events:none;line-height:1.2;transform:translateY(100%);opacity:0;transition:opacity .15s}
 .tile:hover .tip{opacity:1}
@@ -265,6 +265,87 @@ tr.hid td.act{opacity:1}
 .toast{position:fixed;left:50%;bottom:max(24px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:80;background:#f4efe2;color:#1d1a14;padding:10px 18px;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.5);font-size:14px;max-width:calc(100% - 32px)}
 .ghost{position:fixed;z-index:90;width:70px;height:70px;pointer-events:none;transform:translate(-50%,-50%);opacity:.85;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5))}
 
+/* ---------- 붓 · 투명도 · 온도 ---------- */
+.seg{display:grid;grid-template-columns:1fr 1fr;background:#15141a;border:1px solid var(--line);border-radius:9px;padding:3px;margin-bottom:12px}
+.seg button{border:none;background:none;padding:7px 4px;border-radius:7px;font-size:13px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--panel-2);color:var(--gold-hi);font-weight:700}
+.brush-list{display:grid;gap:6px}
+.brush{display:grid;grid-template-columns:78px 1fr;gap:8px;align-items:center;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:5px;text-align:left}
+.brush svg{width:78px;height:32px;background:var(--ivory);border-radius:5px;display:block}
+.brush b{display:block;font-size:13px}.brush small{font-size:11.5px;color:var(--muted);line-height:1.3;display:block}
+.brush.on{border-color:var(--gold-hi);background:#2b2414}
+.op-row{display:grid;grid-template-columns:auto 1fr 40px;gap:8px;align-items:center;font-size:12.5px;color:var(--muted);margin-top:12px}
+.op-row span{font-family:var(--f-mono);text-align:right}
+input[type=range]{width:100%;accent-color:var(--gold)}
+#canvas.brush-mode{cursor:crosshair}
+.temp .k{font-size:12px;color:var(--muted);margin-bottom:6px}
+.temp-track{position:relative;height:10px;border-radius:99px;background:linear-gradient(90deg,#3f7fd6,#9a92b0,#e2483c)}
+#temp-dot{position:absolute;top:50%;width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid var(--wall);transform:translate(-50%,-50%);transition:left .3s}
+.temp-lbl{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-top:5px}
+.temp-lbl b{color:var(--ink)}
+
+/* ---------- 추상화 배우기 ---------- */
+.learn{padding-bottom:60px}
+.lgrid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.lcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;min-width:0}
+.lcard h2,.lh{font-family:var(--f-display);font-size:20px;color:var(--gold-hi);margin-bottom:10px}
+.lh{margin:30px 0 12px}
+.lcard p{color:#d8d1c3;max-width:62ch}
+.lcard .card-frame{margin:4px 0 12px}
+.qs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.qs div{background:#1a1920;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:14px}
+.qs small{display:block;color:var(--muted);font-size:12px}
+.tree-box svg{width:100%;height:auto;display:block;border-radius:6px}
+.tree-steps{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:2px}
+.tree-cap{min-height:3.2em;margin-top:8px}
+.chip{display:inline-block;font-size:12.5px;border-radius:999px;padding:3px 12px;margin-bottom:12px;font-weight:700}
+.cold .chip,.chip.cold{background:#1d2a44;color:#9cc0ff;border:1px solid #33528a}
+.hot .chip,.chip.hot{background:#3a1c1a;color:#ffaa9f;border:1px solid #7a3530}
+.chip.mid{background:#2b2738;color:#cfc4e6;border:1px solid #4d4566}
+.cmp-wrap{overflow-x:auto;margin-top:20px;border:1px solid var(--line);border-radius:12px}
+table.cmp{min-width:540px}
+.cmp th:nth-child(2){color:#9cc0ff}.cmp th:nth-child(3){color:#ffaa9f}
+.cmp td:first-child{color:var(--muted);white-space:nowrap}
+.center{justify-content:center;margin-top:16px}
+.game-grid{display:grid;grid-template-columns:minmax(0,300px) 1fr;gap:22px;align-items:center}
+.game-end{text-align:center;padding:10px}
+.game-end b{font-family:var(--f-display);font-size:42px;color:var(--gold-hi);display:block}
+.fb-ok{color:var(--ok)}.fb-no{color:#ff9d92}
+.egrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.ecard{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.ecard .mini svg{width:100%;height:auto;display:block;border-radius:4px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2)}
+.ecard h3{font-family:var(--f-display);font-size:18px}
+.ecard p{margin:0;font-size:13.5px;color:#d8d1c3}
+.measured{font-size:11px;color:var(--gold-hi);border:1px solid #5d4b22;border-radius:999px;padding:1px 8px;align-self:flex-start}
+.spectrum{position:relative;height:120px;margin:6px 14px}
+.sp-track{position:absolute;left:0;right:0;top:50%;height:10px;transform:translateY(-50%);border-radius:99px;background:linear-gradient(90deg,#3f7fd6,#9a92b0,#e2483c)}
+.sp-dot{position:absolute;top:50%;transform:translate(-50%,-50%);width:20px;height:20px;border-radius:50%;background:var(--ivory);border:3px solid var(--wall);padding:0}
+.sp-dot:hover{background:var(--gold-hi)}
+.sp-dot span{position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:12.5px;color:var(--ink)}
+.sp-dot.up span{bottom:24px}.sp-dot.down span{top:24px}
+.sp-ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-top:20px}
+.acard{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;grid-template-columns:56px minmax(0,1fr);gap:14px;transition:border-color .3s,box-shadow .3s}
+.acard.flash{border-color:var(--gold-hi);box-shadow:0 0 0 3px rgba(236,209,138,.25)}
+.mono{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-size:22px;color:#fff}
+.acard h3{font-family:var(--f-display);font-size:18px}.acard h3 small{font-family:var(--f-body);font-size:12px;color:var(--muted);font-weight:400}
+.acard .meta{color:var(--muted);font-size:12.5px;margin:2px 0 8px}
+.acard .chip{margin-bottom:4px}
+.acard p{margin:6px 0;font-size:13.5px;color:#d8d1c3}
+.acard a{color:var(--gold-hi);font-size:13px}
+.quiz{display:grid;gap:14px;max-width:860px}
+.qitem{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.qitem h3{font-size:15.5px;margin-bottom:10px}
+.qopts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.qopt{justify-content:flex-start;white-space:normal;text-align:left}
+.qopt.right{border-color:var(--ok);background:#18241d;color:var(--ok)}
+.qopt.wrong{border-color:var(--alert);background:#271817;color:#ff9d92}
+.qex{font-size:13.5px;color:#d8d1c3;margin:10px 0 0}
+.qscore{font-family:var(--f-display);font-size:20px;color:var(--gold-hi)}
+@media (max-width:860px){.lgrid2,.game-grid{grid-template-columns:1fr}.egrid{grid-template-columns:repeat(2,minmax(0,1fr))}.qs{grid-template-columns:1fr}}
+@media (max-width:720px){.qopts{grid-template-columns:1fr}.agrid{grid-template-columns:1fr}}
+
 /* ---------- 반응형 ---------- */
 @media (max-width:1180px){
   .studio{grid-template-columns:210px minmax(0,1fr)}
@@ -297,6 +378,7 @@ tr.hid td.act{opacity:1}
   <div class="wrap">
     <div class="brand"><b>LOUVRE</b><span>특별전 · 신진 화가展</span></div>
     <nav class="nav" aria-label="화면 이동">
+      <button class="btn" data-go="learn" id="nav-learn">추상화 배우기</button>
       <button class="btn" data-go="studio" id="nav-studio">작업실</button>
       <button class="btn" data-go="gallery" id="nav-gallery">학급 갤러리</button>
       <button class="btn" data-go="admin" id="nav-admin" hidden>교사 관리실</button>
@@ -342,7 +424,7 @@ tr.hid td.act{opacity:1}
         <p class="err" id="login-err"></p>
         <button class="btn btn-gold enter" type="submit">신진 화가로 입장하기</button>
       </form>
-      <div class="teacher-link"><button class="btn btn-ghost btn-sm" data-go="gallery">입장하지 않고 갤러리 구경하기 →</button></div>
+      <div class="teacher-link"><button class="btn btn-ghost btn-sm" data-go="learn">먼저 추상화 배우기 →</button> <button class="btn btn-ghost btn-sm" data-go="gallery">갤러리 구경하기 →</button></div>
     </div>
   </div>
 </section>
@@ -351,12 +433,19 @@ tr.hid td.act{opacity:1}
 <section id="screen-studio" class="screen" hidden>
   <div class="wrap studio">
     <aside class="panel lib">
-      <h2>조형 요소 <small>끌어다 놓거나 누르기</small></h2>
-      <div id="lib"></div>
+      <div class="seg" role="group" aria-label="그리기 방식"><button data-mode="shape" aria-pressed="true">도형 · 차가운</button><button data-mode="brush" aria-pressed="false">붓 · 뜨거운</button></div>
+      <div id="lib-wrap"><h2>조형 요소 <small>끌어다 놓거나 누르기</small></h2><div id="lib"></div></div>
+      <div id="brushes" hidden>
+        <h2>붓 <small>캔버스 위를 드래그</small></h2>
+        <div class="brush-list" id="brush-list"></div>
+        <div class="op-row" style="grid-template-columns:auto 1fr 40px"><label for="bs">굵기</label><input type="range" id="bs" min="3" max="40" value="12"><span id="bs-val">12</span></div>
+        <p class="lib-note">그린 붓 자국을 옮기거나 지우려면 '도형' 모드에서 눌러 선택하세요.</p>
+      </div>
       <div class="lib-group">
         <h3>색 · 삼원색 + 무채색</h3>
         <div class="palette" id="palette"></div>
-        <p class="lib-note">고른 색은 새 도형과 선택한 도형에 함께 적용돼요.</p>
+        <div class="op-row"><label for="op">투명도</label><input type="range" id="op" min="0" max="85" value="0"><span id="op-val">0%</span></div>
+        <p class="lib-note">색과 투명도는 새로 그리는 것과 선택한 도형에 함께 적용돼요.</p>
       </div>
     </aside>
 
@@ -400,6 +489,7 @@ tr.hid td.act{opacity:1}
             <div class="nums"><span id="n-left">왼쪽 0%</span><span id="n-right">오른쪽 0%</span></div>
           </div>
           <div class="bars" id="bars"></div>
+          <div class="temp"><div class="k">차가운 추상 ↔ 뜨거운 추상</div><div class="temp-track"><span id="temp-dot" hidden></span></div><div class="temp-lbl"><span>질서 · 이성</span><b id="temp-val">-</b><span>감정 · 직관</span></div></div>
           <div><div class="k" style="font-size:12px;color:var(--muted);margin-bottom:6px">조형 원리 태그</div><div class="tags" id="live-tags"><span class="none">도형을 놓으면 태그가 생겨요</span></div></div>
         </div>
       </div>
@@ -481,6 +571,21 @@ tr.hid td.act{opacity:1}
   </div>
 </section>
 
+<!-- ================= 추상화 배우기 ================= -->
+<section id="screen-learn" class="screen" hidden>
+  <div class="wrap learn">
+    <div class="gal-head"><div class="grow"><div class="case-no" style="color:var(--gold-hi)">큐레이터 교육실</div><h1>추상화 배우기</h1><p>그림을 그리기 전에, 루브르 큐레이터가 알려 주는 추상화의 비밀</p></div></div>
+    <div class="tabs" role="tablist" id="ltabs">
+      <button class="tab" data-l="what" aria-selected="true">① 추상화란?</button>
+      <button class="tab" data-l="temp" aria-selected="false">② 차가운 · 뜨거운 추상</button>
+      <button class="tab" data-l="elem" aria-selected="false">③ 조형 요소 · 원리</button>
+      <button class="tab" data-l="artist" aria-selected="false">④ 추상화 화가</button>
+      <button class="tab" data-l="quiz" aria-selected="false">⑤ 확인 퀴즈</button>
+    </div>
+    <div id="lbody"></div>
+  </div>
+</section>
+
 <div class="modal" id="modal" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
 <div class="present" id="present" hidden></div>
 <div class="toast" id="toast" hidden></div>
@@ -493,7 +598,7 @@ tr.hid td.act{opacity:1}
 const CONFIG = {
   API_URL: '',            // 예: 'https://script.google.com/macros/s/XXXX/exec'
   GRADE: '2학년',          // 학년 표시
-  CLASSES: 6,             // 반 수 (1반 ~ N반)
+  CLASSES: 10,            // 반 수 (1반 ~ N반)
   DEMO_TEACHER_PIN: '1234'// 체험 모드 교사 비밀번호 (실제 비밀번호는 Apps Script 코드에서 설정)
 };
 
@@ -538,9 +643,76 @@ const COLORS = {
 const TYPE_INFO = {
   dot:{name:'점',kind:'점'}, hline:{name:'직선',kind:'선'}, curve:{name:'곡선',kind:'선'}, arc:{name:'호선',kind:'선'},
   zigzag:{name:'지그재그선',kind:'선'}, rect:{name:'사각형',kind:'면'}, circle:{name:'원',kind:'면'},
-  triangle:{name:'삼각형',kind:'면'}, semi:{name:'반원',kind:'면'}
+  triangle:{name:'삼각형',kind:'면'}, semi:{name:'반원',kind:'면'}, brush:{name:'붓 자국',kind:'선'}
 };
 const STROKE_TYPES = ['curve','arc','zigzag'];
+const BRUSHES = {
+  smooth:  {name:'둥근 붓',    desc:'매끄럽게 이어지는 선'},
+  bristle: {name:'납작 붓',    desc:'붓털 자국이 남는 붓질'},
+  crayon:  {name:'크레용',     desc:'까끌까끌한 질감'},
+  splatter:{name:'물감 뿌리기', desc:'폴록처럼 흩뿌린 방울'},
+  spray:   {name:'스프레이',   desc:'안개처럼 퍼지는 점'}
+};
+function seedRand(str){let h=1779033703^str.length;for(let i=0;i<str.length;i++){h=Math.imul(h^str.charCodeAt(i),3432918353);h=h<<13|h>>>19}
+  return function(){h=Math.imul(h^h>>>16,2246822507);h=Math.imul(h^h>>>13,3266489909);h^=h>>>16;return (h>>>0)/4294967296}}
+function brushPts(s){const a=s.pts||[],p=[];for(let i=0;i+1<a.length;i+=2)p.push([a[i],a[i+1]]);if(p.length===1)p.push([p[0][0]+1,p[0][1]+1]);return p.length?p:[[0,0],[1,1]]}
+function smoothD(p){
+  if(p.length<3)return 'M'+p.map(q=>r1(q[0])+' '+r1(q[1])).join('L');
+  let d=`M${r1(p[0][0])} ${r1(p[0][1])}`;
+  for(let i=1;i<p.length-1;i++)d+=`Q${r1(p[i][0])} ${r1(p[i][1])} ${r1((p[i][0]+p[i+1][0])/2)} ${r1((p[i][1]+p[i+1][1])/2)}`;
+  const l=p[p.length-1];return d+`L${r1(l[0])} ${r1(l[1])}`;
+}
+function resample(p,step){
+  step=Math.max(2,step);const out=[p[0].slice()];let acc=0;
+  for(let i=1;i<p.length;i++){let x0=p[i-1][0],y0=p[i-1][1];const x1=p[i][0],y1=p[i][1];let seg=Math.hypot(x1-x0,y1-y0);
+    while(acc+seg>=step&&out.length<500){const t=(step-acc)/seg;x0+=(x1-x0)*t;y0+=(y1-y0)*t;out.push([x0,y0]);seg=Math.hypot(x1-x0,y1-y0);acc=0}
+    acc+=seg}
+  if(out.length<2)out.push(p[p.length-1].slice());return out;
+}
+function simplify(pts,tol){
+  if(pts.length<3)return pts;const keep=pts.map(()=>false);keep[0]=keep[pts.length-1]=true;const st=[[0,pts.length-1]];
+  while(st.length){const [a,b]=st.pop();let md=0,mi=-1;const [x1,y1]=pts[a],[x2,y2]=pts[b],L=Math.hypot(x2-x1,y2-y1)||1;
+    for(let i=a+1;i<b;i++){const d=Math.abs((x2-x1)*(y1-pts[i][1])-(x1-pts[i][0])*(y2-y1))/L;if(d>md){md=d;mi=i}}
+    if(md>tol){keep[mi]=true;st.push([a,mi],[mi,b])}}
+  return pts.filter((_,i)=>keep[i]);
+}
+const brushScale=s=>[s.w/(s.bw||s.w||1),s.h/(s.bh||s.h||1)];
+function brushArea(s){const [sx,sy]=brushScale(s),p=brushPts(s).map(q=>[q[0]*sx,q[1]*sy]),sw=s.sw||10,f={splatter:1.4,spray:.7,crayon:.9}[s.br]||1;return Math.max(polyLen(p),sw)*sw*Math.sqrt(sx*sy)*f}
+function brushMarkup(s,hex,hit){
+  const p=brushPts(s),sw=s.sw||10,R=seedRand(String(s.id)+s.br),[sx,sy]=brushScale(s);
+  const cap='fill="none" stroke-linecap="round" stroke-linejoin="round"';let o='';
+  switch(s.br){
+    case 'bristle':{
+      const q=resample(p,6),nrm=q.map((v,i)=>{const a=q[Math.max(0,i-1)],b=q[Math.min(q.length-1,i+1)];let nx=-(b[1]-a[1]),ny=b[0]-a[0];const L=Math.hypot(nx,ny)||1;return [nx/L,ny/L]});
+      for(let k=0;k<6;k++){const off=(k-2.5)/2.5*sw*0.5,wob=(R()-.5)*sw*0.15;
+        o+=`<path d="${smoothD(q.map((v,i)=>[v[0]+nrm[i][0]*(off+wob),v[1]+nrm[i][1]*(off+wob)]))}" stroke="${hex}" stroke-width="${r1(sw*(0.16+R()*0.2))}" stroke-opacity="${r1(0.5+R()*0.5)}" ${cap}/>`}
+      break}
+    case 'crayon':{const q=resample(p,Math.max(4,sw*0.7));
+      for(let k=0;k<3;k++)o+=`<path d="${smoothD(q.map(v=>[v[0]+(R()-.5)*sw*0.5,v[1]+(R()-.5)*sw*0.5]))}" stroke="${hex}" stroke-width="${r1(sw*0.42)}" stroke-opacity=".72" stroke-dasharray="${r1(sw*1.6)} ${r1(sw*0.35)}" ${cap}/>`;
+      break}
+    case 'splatter':{const q=resample(p,Math.max(4,sw*0.8));
+      o+=`<path d="${smoothD(q.map(v=>[v[0]+(R()-.5)*sw*0.6,v[1]+(R()-.5)*sw*0.6]))}" stroke="${hex}" stroke-width="${r1(sw*0.45)}" ${cap}/>`;
+      q.forEach(v=>{const n=R()<.6?1+Math.floor(R()*2):0;
+        for(let k=0;k<n;k++){const a=R()*6.283,d=sw*(0.6+R()*3);o+=`<circle cx="${r1(v[0]+Math.cos(a)*d)}" cy="${r1(v[1]+Math.sin(a)*d)}" r="${r1(sw*(0.12+R()*0.45))}" fill="${hex}"/>`}
+        if(R()<.07)o+=`<circle cx="${r1(v[0])}" cy="${r1(v[1])}" r="${r1(sw*(0.7+R()*0.6))}" fill="${hex}"/>`});
+      break}
+    case 'spray':{const q=resample(p,Math.max(3,sw*0.5));
+      q.forEach(v=>{for(let k=0;k<5;k++){const a=R()*6.283,d=Math.sqrt(R())*sw*1.6;o+=`<circle cx="${r1(v[0]+Math.cos(a)*d)}" cy="${r1(v[1]+Math.sin(a)*d)}" r="${r1(Math.max(1,sw*0.09))}" fill="${hex}" fill-opacity=".7"/>`}});
+      break}
+    default:
+      if(s.color==='white')o+=`<path d="${smoothD(p)}" stroke="#b3a88f" stroke-width="${sw+3}" ${cap}/>`;
+      o+=`<path d="${smoothD(p)}" stroke="${hex}" stroke-width="${sw}" ${cap}/>`;
+  }
+  if(hit)o+=`<path d="${smoothD(p)}" stroke="transparent" stroke-width="${Math.max(sw*2,26)}" ${cap} pointer-events="stroke"/>`;
+  return `<g transform="scale(${Math.round(sx*1000)/1000} ${Math.round(sy*1000)/1000})">${o}</g>`;
+}
+function makeBrush(raw,br,color,sw,op){
+  let pts=simplify(raw,1.2);if(pts.length<2)pts=[raw[0],[raw[0][0]+1,raw[0][1]+1]];
+  const xs=pts.map(q=>q[0]),ys=pts.map(q=>q[1]),minx=Math.min(...xs),maxx=Math.max(...xs),miny=Math.min(...ys),maxy=Math.max(...ys);
+  const cx=(minx+maxx)/2,cy=(miny+maxy)/2,bw=Math.max(Math.round(maxx-minx),4),bh=Math.max(Math.round(maxy-miny),4),flat=[];
+  pts.forEach(q=>flat.push(Math.round(q[0]-cx),Math.round(q[1]-cy)));
+  return {id:uid(),type:'brush',br,x:r1(cx),y:r1(cy),w:bw,h:bh,bw,bh,rot:0,color,sw,op,pts:flat};
+}
 const LIB = [
   {group:'점', items:[{type:'dot',name:'작은 점',w:26,h:26},{type:'dot',name:'큰 점',w:62,h:62}]},
   {group:'선 · 몬드리안 & 칸딘스키', items:[
@@ -583,10 +755,12 @@ function area(s){
     case 'circle':return Math.PI*w*h/4;
     case 'triangle':return w*h/2;
     case 'semi':return Math.PI*(w/2)*h/2;
+    case 'brush':return brushArea(s);
     default:return polyLen(strokePts(s))*(s.sw||8);
   }
 }
 function localCentroid(s){
+  if(s.type==='brush'){const [sx,sy]=brushScale(s),p=brushPts(s);let x=0,y=0;p.forEach(q=>{x+=q[0];y+=q[1]});return [x/p.length*sx,y/p.length*sy]}
   if(s.type==='triangle')return [0,s.h/6];
   if(s.type==='semi')return [0,s.h/2-4*s.h/(3*Math.PI)];
   if(STROKE_TYPES.includes(s.type)){const p=strokePts(s);let x=0,y=0;p.forEach(q=>{x+=q[0];y+=q[1]});return [x/p.length,y/p.length]}
@@ -608,6 +782,7 @@ function shapeMarkup(s,hit){
     case 'circle':inner=`<ellipse rx="${r1(w/2)}" ry="${r1(h/2)}" fill="${hex}"${ol}/>`;break;
     case 'triangle':inner=`<polygon points="0,${r1(-h/2)} ${r1(w/2)},${r1(h/2)} ${r1(-w/2)},${r1(h/2)}" fill="${hex}"${ol}/>`;break;
     case 'semi':inner=`<path d="M${r1(-w/2)} ${r1(h/2)}A${r1(w/2)} ${r1(h)} 0 0 1 ${r1(w/2)} ${r1(h/2)}Z" fill="${hex}"${ol}/>`;break;
+    case 'brush':inner=brushMarkup(s,hex,hit);break;
     default:{
       const d=strokeD(s), sw=s.sw||8;
       if(s.color==='white')inner+=`<path d="${d}" fill="none" stroke="#b3a88f" stroke-width="${sw+3}" stroke-linecap="round" stroke-linejoin="round"/>`;
@@ -616,7 +791,8 @@ function shapeMarkup(s,hit){
     }
   }
   if(hit&&(s.type==='hline'||(s.type==='rect'&&Math.min(w,h)<20)))inner+=`<rect x="${r1(-w/2)}" y="${r1(-Math.max(h,24)/2)}" width="${r1(w)}" height="${r1(Math.max(h,24))}" fill="transparent"/>`;
-  return `<g class="shape" data-id="${s.id}" transform="translate(${r1(s.x)} ${r1(s.y)}) rotate(${r1(s.rot)})">${inner}</g>`;
+  const op=s.op??1;
+  return `<g class="shape" data-id="${s.id}" transform="translate(${r1(s.x)} ${r1(s.y)}) rotate(${r1(s.rot)})"${op<1?` opacity="${Math.round(op*100)/100}"`:''}>${inner}</g>`;
 }
 let _clip=0;
 function artSVG(shapes,attrs=''){
@@ -628,7 +804,8 @@ function cleanShape(o){
   const n=(v,a,b,d)=>{v=parseFloat(v);return isFinite(v)?clamp(v,a,b):d};
   return {id:String(o.id||uid()).replace(/[^a-z0-9]/gi,'').slice(0,12)||uid(),type:o.type,
     x:n(o.x,-300,900,300),y:n(o.y,-300,900,300),w:n(o.w,4,1400,100),h:n(o.h,2,1400,100),
-    rot:n(o.rot,-720,720,0),color:COLORS[o.color]?o.color:'black',sw:n(o.sw,2,60,8)};
+    rot:n(o.rot,-720,720,0),color:COLORS[o.color]?o.color:'black',sw:n(o.sw,2,60,8),op:n(o.op,0.1,1,1),
+    ...(o.type==='brush'?{br:BRUSHES[o.br]?o.br:'smooth',bw:n(o.bw,1,1400,100),bh:n(o.bh,1,1400,100),pts:(Array.isArray(o.pts)?o.pts:[]).slice(0,600).map(v=>clamp(Math.round(+v||0),-1400,1400))}:{})};
 }
 
 /* ---------- 조형 분석 엔진 ---------- */
@@ -637,7 +814,7 @@ function symmetry(shapes,ws){
   shapes.forEach((s,i)=>{
     tot+=ws[i];
     const a=((s.rot%180)+180)%180;
-    const selfSym = s.type==='dot'||s.type==='circle'||a<8||a>172||(Math.abs(a-90)<8&&s.type!=='triangle'&&s.type!=='semi');
+    const selfSym = s.type!=='brush'&&(s.type==='dot'||s.type==='circle'||a<8||a>172||(Math.abs(a-90)<8&&s.type!=='triangle'&&s.type!=='semi'));
     if(Math.abs(s.x-300)<22&&selfSym){m+=ws[i];return}
     const mx=600-s.x, A=area(s);
     if(shapes.some((t,j)=>j!==i&&t.type===s.type&&t.color===s.color&&Math.abs(t.x-mx)<38&&Math.abs(t.y-s.y)<38&&Math.abs(area(t)/A-1)<0.4))m+=ws[i];
@@ -649,23 +826,24 @@ function isDiagonal(s){
   const a=((s.rot%90)+90)%90;return a>=15&&a<=75;
 }
 function analyze(shapes){
-  const out={n:shapes.length,cx:300,cy:300,dx:0,dy:0,left:0,right:0,key:'empty',sym:0,balance:0,move:0,rhythm:0,contrast:0,coverage:0,prim:0,tags:[],kinds:new Set(),dyn:0};
+  const out={n:shapes.length,cx:300,cy:300,dx:0,dy:0,left:0,right:0,key:'empty',sym:0,balance:0,move:0,rhythm:0,contrast:0,coverage:0,prim:0,tags:[],kinds:new Set(),dyn:0,temp:0};
   if(!shapes.length)return out;
-  let W=0,cx=0,cy=0,L=0,R=0,mv=0,mvW=0,curveW=0,cov=0;const ws=[],areas=[],typeCount={},primCount={};
+  let W=0,cx=0,cy=0,L=0,R=0,mv=0,mvW=0,curveW=0,cov=0,tp=0;const ws=[],areas=[],typeCount={},primCount={};
   shapes.forEach(s=>{
-    const A=area(s),w=A*(COLORS[s.color]?.w||1),[x,y]=worldCentroid(s);
+    const A=area(s),op=s.op??1,w=A*(COLORS[s.color]?.w||1)*(0.35+0.65*op),[x,y]=worldCentroid(s);
     ws.push(w);areas.push(A);W+=w;cx+=x*w;cy+=y*w;cov+=A;
     if(x<299)L+=w;else if(x>301)R+=w;else{L+=w/2;R+=w/2}
     out.kinds.add(TYPE_INFO[s.type].kind);
     typeCount[s.type]=(typeCount[s.type]||0)+1;
     if(COLORS[s.color]?.primary)primCount[s.color]=(primCount[s.color]||0)+1;
     let fct=0;
-    if(s.type==='zigzag')fct=1;else if(s.type==='curve')fct=.85;else if(s.type==='arc')fct=.7;
+    if(s.type==='zigzag'||s.type==='brush')fct=1;else if(s.type==='curve')fct=.85;else if(s.type==='arc')fct=.7;
     if(s.type==='triangle')fct=Math.max(fct,.45);
     if(isDiagonal(s))fct=Math.max(fct,1);
     if(fct>=.7)out.dyn++;
     const sq=Math.sqrt(A);mv+=sq*fct;mvW+=sq;
-    if(['curve','arc','semi','circle'].includes(s.type))curveW+=sq;
+    if(['curve','arc','semi','circle','brush'].includes(s.type))curveW+=sq;
+    let tf=({brush:1,zigzag:.9,curve:.8,arc:.7,circle:.3,semi:.35,triangle:.3})[s.type]||0;if(isDiagonal(s))tf=Math.max(tf,.6);tp+=sq*tf;
   });
   cx/=W;cy/=W;
   Object.assign(out,{cx,cy,dx:(cx-300)/300,dy:(cy-300)/300,left:L/W,right:R/W});
@@ -679,11 +857,13 @@ function analyze(shapes){
   const sorted=[...areas].sort((a,b)=>a-b);
   out.contrast=shapes.length<2?0:Math.round(clamp(Math.log2(sorted[sorted.length-1]/sorted[0])*15,0,100));
   out.coverage=clamp(cov/360000,0,1);
+  out.temp=Math.round(clamp(100*tp/mvW,0,100));
   out.prim=Object.keys(primCount).length;
   const primShapes=Object.values(primCount).reduce((a,b)=>a+b,0);
   const curveShare=curveW/mvW;
   const t=[];
   if(out.key==='sym')t.push('#대칭_균형');else if(out.key==='asym')t.push('#비대칭_균형');else if(out.key==='heavy')t.push('#불균형의_긴장감');
+  if(out.temp>=55)t.push('#뜨거운_추상');else if(out.temp<=10&&shapes.length>=3)t.push('#차가운_추상');
   if(out.move>=50)t.push('#강렬한_동세');else if(curveShare>0.45&&shapes.length>=2)t.push('#부드러운_곡선_리듬');else if(out.move<12&&shapes.length>=3)t.push('#정적인_안정감');
   if(out.prim===3)t.push('#삼원색_조화');else if(out.prim===0&&shapes.length>=2)t.push('#무채색_절제');else if(primShapes===1&&shapes.length>=4)t.push('#한_점_강조');
   if(out.rhythm>=60)t.push('#반복과_리듬');
@@ -723,7 +903,7 @@ function missionList(a){
 
 /* ---------- 상태 ---------- */
 const S = {
-  cls:'', nick:'', color:'red', shapes:[], sel:null, hist:[], fut:[], showCog:true,
+  cls:'', nick:'', color:'red', mode:'shape', brush:'smooth', brushSize:12, opacity:1, shapes:[], sel:null, hist:[], fut:[], showCog:true,
   editing:null, prevKey:'empty', holdMsg:null, lastTouched:null,
   gCls:'', items:[], admin:sess.get('louvre_tpin'), liked:new Set(store.get('louvre_liked',[]))
 };
@@ -809,6 +989,7 @@ function go(name){
   if(name==='gallery')loadGallery();
   if(name==='admin')loadAdmin();
   if(name==='studio')renderAll();
+  if(name==='learn')renderLearn();
   window.scrollTo(0,0);
 }
 document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b){e.preventDefault();go(b.dataset.go)}});
@@ -857,7 +1038,7 @@ function renderPalette(){
 }
 $('#palette').addEventListener('click',e=>{
   const b=e.target.closest('[data-color]');if(!b)return;
-  S.color=b.dataset.color;renderPalette();renderLib();
+  S.color=b.dataset.color;renderPalette();renderLib();renderBrushes();
   const s=selShape();if(s&&s.color!==S.color){snap();s.color=S.color;commit()}
 });
 
@@ -888,10 +1069,42 @@ $('#lib').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.ta
 function addShape(item,x,y){
   if(S.shapes.length>=120){toast('도형은 120개까지 놓을 수 있어요.');return}
   snap();
-  const s={id:uid(),type:item.type,x,y,w:item.w,h:item.h,rot:item.rot||0,color:S.color,sw:item.sw||8};
+  const s={id:uid(),type:item.type,x,y,w:item.w,h:item.h,rot:item.rot||0,color:S.color,sw:item.sw||8,op:S.opacity};
   S.shapes.push(s);S.sel=s.id;S.lastTouched=s.id;commit();
 }
 const selShape=()=>S.shapes.find(s=>s.id===S.sel);
+
+/* 붓 모드 · 투명도 */
+const SAMPLE_STROKE=[[-230,40],[-170,-30],[-100,-50],[-30,10],[40,50],[110,20],[170,-40],[230,-20]];
+function renderBrushes(){
+  $('#brush-list').innerHTML=Object.entries(BRUSHES).map(([k,b])=>{
+    const sh=makeBrush(SAMPLE_STROKE.map(q=>[q[0]+300,q[1]+300]),k,S.color==='white'?'gray':S.color,26,1);sh.id='pv'+k;
+    return `<button class="brush${S.brush===k?' on':''}" data-br="${k}" aria-pressed="${S.brush===k}"><svg viewBox="40 210 520 180" aria-hidden="true">${shapeMarkup(sh,false)}</svg><span><b>${b.name}</b><small>${b.desc}</small></span></button>`}).join('');
+  $('#bs').value=S.brushSize;$('#bs-val').textContent=S.brushSize;
+}
+function setMode(m){
+  S.mode=m;$$('.seg [data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===m));
+  $('#lib-wrap').hidden=m!=='shape';$('#brushes').hidden=m!=='brush';svg.classList.toggle('brush-mode',m==='brush');
+  if(m==='brush')S.sel=null;renderSel();
+}
+$('.seg').addEventListener('click',e=>{const b=e.target.closest('[data-mode]');if(b)setMode(b.dataset.mode)});
+$('#brush-list').addEventListener('click',e=>{const b=e.target.closest('[data-br]');if(b){S.brush=b.dataset.br;renderBrushes()}});
+$('#bs').addEventListener('input',e=>{S.brushSize=+e.target.value;$('#bs-val').textContent=S.brushSize});
+function syncOp(s){S.opacity=s.op??1;const t=Math.round((1-S.opacity)*100);$('#op').value=t;$('#op-val').textContent=t+'%'}
+$('#op').addEventListener('input',e=>{
+  const t=+e.target.value;S.opacity=Math.round(100-t)/100;$('#op-val').textContent=t+'%';
+  const s=selShape();if(s){if(!S._opSnap){snap();S._opSnap=true}s.op=S.opacity;S.lastTouched=s.id;renderShapes();renderSel();liveAnalysis(false)}
+});
+$('#op').addEventListener('change',()=>{if(S._opSnap){S._opSnap=false;commit()}});
+let drawing=null;
+function renderDraft(){gSel.innerHTML=`<path d="${smoothD(drawing.pts)}" fill="none" stroke="${COLORS[S.color].hex}" stroke-opacity="${S.opacity}" stroke-width="${S.brushSize}" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>`}
+function finishStroke(){
+  const d=drawing;drawing=null;gSel.innerHTML='';if(!d)return;
+  if(S.shapes.length>=120){toast('요소는 120개까지 놓을 수 있어요.');return}
+  const sh=makeBrush(d.pts,S.brush,S.color,S.brushSize,S.opacity);
+  if(JSON.stringify(S.shapes).length+JSON.stringify(sh).length>42000){toast('붓질이 너무 많아 더 저장할 수 없어요. 몇 개를 지워 주세요.');return}
+  snap();S.shapes.push(sh);S.lastTouched=sh.id;commit();
+}
 
 /* 되돌리기 */
 function snap(){S.hist.push(JSON.stringify(S.shapes));if(S.hist.length>60)S.hist.shift();S.fut=[]}
@@ -909,10 +1122,11 @@ $('#b-clear').onclick=function(){
 /* 캔버스 렌더 */
 function svgPt(e){const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())}
 function renderShapes(){gShapes.innerHTML=S.shapes.map(s=>shapeMarkup(s,true)).join('')}
+const selPad=s=>6+(STROKE_TYPES.includes(s.type)?(s.sw||8)/2:s.type==='brush'?(s.sw||10)/2*Math.sqrt(brushScale(s)[0]*brushScale(s)[1]):0);
 function renderSel(){
   const s=selShape();
   if(!s){gSel.innerHTML='';renderSelBar();return}
-  const pad=6+(STROKE_TYPES.includes(s.type)?(s.sw||8)/2:0);
+  const pad=selPad(s);
   const hw=s.w/2+pad, hh=s.h/2+pad, k=600/Math.max(svg.getBoundingClientRect().width,200);
   const hr=Math.max(9,11*k), sw=Math.max(1.5,1.6*k);
   gSel.innerHTML=`<g transform="translate(${r1(s.x)} ${r1(s.y)}) rotate(${r1(s.rot)})">
@@ -926,6 +1140,7 @@ function renderSel(){
 }
 function renderSelBar(){
   const s=selShape(),bar=$('#sel-bar');
+  if(!s&&S.mode==='brush'){bar.innerHTML='<span class="sel-empty">붓 모드: 캔버스 위를 드래그해 자유롭게 그려요. 색·투명도·붓을 바꿔 가며 감정을 담아 보세요!</span>';return}
   if(!s){bar.innerHTML=`<span class="sel-empty">도형을 누르면 색·회전·크기·순서를 바꿀 수 있어요. (Delete 삭제 · 방향키 이동 · Ctrl+Z 되돌리기)</span>`;return}
   const sws=Object.entries(COLORS).map(([k,c])=>`<button class="mini-sw" data-sc="${k}" aria-pressed="${s.color===k}" style="background:${c.hex}" aria-label="${c.name}으로 바꾸기"></button>`).join('');
   const thick=STROKE_TYPES.includes(s.type)?`<span class="sep"></span><button class="btn btn-sm" data-act="thin">선 가늘게</button><button class="btn btn-sm" data-act="thick">선 굵게</button>`:'';
@@ -940,7 +1155,7 @@ function renderSelBar(){
 $('#sel-bar').addEventListener('click',e=>{
   const s=selShape();if(!s)return;
   const c=e.target.closest('[data-sc]');
-  if(c){snap();s.color=c.dataset.sc;S.color=s.color;renderPalette();renderLib();S.lastTouched=s.id;commit();return}
+  if(c){snap();s.color=c.dataset.sc;S.color=s.color;renderPalette();renderLib();renderBrushes();S.lastTouched=s.id;commit();return}
   const b=e.target.closest('[data-act]');if(!b)return;
   act(b.dataset.act);
 });
@@ -966,17 +1181,19 @@ function act(a){
 let drag=null;
 svg.addEventListener('pointerdown',e=>{
   const p=svgPt(e),t=e.target;
+  if(S.mode==='brush'){S.sel=null;drawing={pts:[[p.x,p.y]]};svg.setPointerCapture(e.pointerId);e.preventDefault();renderDraft();return}
   if(t.closest('.h-resize')||t.closest('.h-rot')){
     const s=selShape();if(!s)return;
     drag={mode:t.closest('.h-resize')?'resize':'rot',s,snapped:false,uni:s.type==='dot'};
   }else{
     const g=t.closest('.shape');
-    if(g){const s=S.shapes.find(x=>x.id===g.dataset.id);S.sel=s.id;drag={mode:'move',s,ox:p.x-s.x,oy:p.y-s.y,snapped:false};renderSel()}
+    if(g){const s=S.shapes.find(x=>x.id===g.dataset.id);S.sel=s.id;syncOp(s);drag={mode:'move',s,ox:p.x-s.x,oy:p.y-s.y,snapped:false};renderSel()}
     else{S.sel=null;renderSel();return}
   }
   svg.setPointerCapture(e.pointerId);e.preventDefault();
 });
 svg.addEventListener('pointermove',e=>{
+  if(drawing){const q=svgPt(e),l=drawing.pts[drawing.pts.length-1];if(Math.hypot(q.x-l[0],q.y-l[1])>=4&&drawing.pts.length<400){drawing.pts.push([q.x,q.y]);renderDraft()}return}
   if(!drag)return;const p=svgPt(e),s=drag.s;
   if(!drag.snapped){snap();drag.snapped=true}
   if(drag.mode==='move'){s.x=clamp(p.x-drag.ox,-100,700);s.y=clamp(p.y-drag.oy,-100,700)}
@@ -986,14 +1203,14 @@ svg.addEventListener('pointermove',e=>{
   }else{
     const r=-s.rot*Math.PI/180,dx=p.x-s.x,dy=p.y-s.y;
     const lx=dx*Math.cos(r)-dy*Math.sin(r),ly=dx*Math.sin(r)+dy*Math.cos(r);
-    const pad=6+(STROKE_TYPES.includes(s.type)?(s.sw||8)/2:0);
+    const pad=selPad(s);
     if(drag.uni){const v=Math.max(8,(Math.abs(lx)+Math.abs(ly))-pad*2);s.w=s.h=v}
     else{s.w=clamp(2*Math.abs(lx)-pad*2,8,1200);s.h=clamp(2*Math.abs(ly)-pad*2,s.type==='hline'?4:6,1200)}
   }
   S.lastTouched=s.id;
   renderShapes();renderSel();liveAnalysis(false);
 });
-function endDrag(){if(!drag)return;const moved=drag.snapped;drag=null;if(moved)commit();}
+function endDrag(){if(drawing){finishStroke();return}if(!drag)return;const moved=drag.snapped;drag=null;if(moved)commit();}
 svg.addEventListener('pointerup',endDrag);svg.addEventListener('pointercancel',endDrag);
 
 document.addEventListener('keydown',e=>{
@@ -1049,6 +1266,8 @@ function liveAnalysis(onCommit){
   wl.setAttribute('height',r1(hl));wl.setAttribute('y',r1(52-hl));wr.setAttribute('height',r1(hr));wr.setAttribute('y',r1(52-hr));
   $('#n-left').textContent=`왼쪽 ${Math.round(a.left*100)}%`;$('#n-right').textContent=`오른쪽 ${Math.round(a.right*100)}%`;
   $('#bars').innerHTML=[['균형',a.balance],['동세',a.move],['리듬',a.rhythm],['대비',a.contrast]].map(([k,v])=>`<div class="bar"><span>${k}</span><div class="track"><div class="fill" style="width:${a.n?v:0}%"></div></div><span class="n">${a.n?v:'-'}</span></div>`).join('');
+  $('#temp-dot').hidden=!a.n;$('#temp-dot').style.left=(a.n?a.temp:50)+'%';
+  $('#temp-val').textContent=!a.n?'-':a.temp>=55?`뜨거운 쪽 ${a.temp}`:a.temp<=15?`차가운 쪽 ${a.temp}`:`중간 ${a.temp}`;
   $('#live-tags').innerHTML=a.tags.length?a.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join(''):'<span class="none">도형을 놓으면 태그가 생겨요</span>';
   $('#missions').innerHTML=missionList(a).map(m=>`<li class="${m.ok?'done':''}"><span class="ck">${m.ok?'✓':''}</span><span>${esc(m.t)}</span></li>`).join('');
   return a;
@@ -1059,7 +1278,7 @@ function commit(fromUndo){
   $('#b-undo').disabled=!S.hist.length;$('#b-redo').disabled=!S.fut.length;
 }
 function renderAll(){
-  renderLib();renderPalette();
+  renderLib();renderPalette();renderBrushes();
   const ed=$('#editing-chip');
   if(S.editing){ed.hidden=false;ed.innerHTML=`수정 중: ${esc(S.editing.title)} <button class="btn btn-ghost btn-sm" id="b-cancel-edit">새 작품으로</button>`}
   else ed.hidden=true;
@@ -1096,7 +1315,7 @@ $('#b-submit').onclick=()=>{
     if(hasBad(title)||hasBad(note)){err.textContent='전시실에 어울리는 말로 바꿔 주세요.';return}
     if(pin&&!/^\d{4}$/.test(pin)){err.textContent='비밀번호는 숫자 4자리로 적어 주세요.';return}
     const btn=$('#sub-btn');btn.disabled=true;btn.textContent='전시실로 옮기는 중…';
-    const shapes=S.shapes.map(s=>({id:s.id,type:s.type,x:r1(s.x),y:r1(s.y),w:r1(s.w),h:r1(s.h),rot:r1(s.rot),color:s.color,sw:r1(s.sw||8)}));
+    const shapes=S.shapes.map(s=>{const o={id:s.id,type:s.type,x:r1(s.x),y:r1(s.y),w:r1(s.w),h:r1(s.h),rot:r1(s.rot),color:s.color,sw:r1(s.sw||8)};if((s.op??1)<1)o.op=Math.round(s.op*100)/100;if(s.type==='brush'){o.br=s.br;o.bw=s.bw;o.bh=s.bh;o.pts=s.pts}return o});
     try{
       const res=ed?await api('update',{id:ed.id,pin:ed.pin,title,note,shapes,tags:a.tags})
                   :await api('submit',{cls:S.cls,nickname:S.nick,title,note,pin,shapes,tags:a.tags});
@@ -1132,21 +1351,21 @@ async function loadGallery(quiet){
   if(!S.gCls)S.gCls=S.cls||CLASS_LIST[0];
   if(!quiet&&!S.items.length)$('#gal-grid').innerHTML='<div class="empty">전시실 조명을 켜는 중…</div>';
   try{
-    const res=S.admin?await api('adminList',{tpin:S.admin}):await api('list',{});
+    const res=S.admin?await api('adminList',{tpin:S.admin}):await api('list',{cls:S.gCls==='전체'?'':S.gCls});
     S.items=res.items.map(normalize);renderGallery();
   }catch(e){
     if(S.admin&&/비밀번호/.test(e.message)){logoutTeacher();return loadGallery()}
     if(!quiet)$('#gal-grid').innerHTML=`<div class="empty"><b>갤러리를 불러오지 못했어요</b>${esc(e.message)}</div>`;
   }
   clearInterval(galTimer);
-  galTimer=setInterval(()=>{if(!$('#screen-gallery').hidden&&$('#modal').hidden)loadGallery(true)},25000);
+  galTimer=setInterval(()=>{if(!$('#screen-gallery').hidden&&$('#modal').hidden)loadGallery(true)},40000);
 }
 function sortItems(list,mode){
   return [...list].sort((a,b)=>(b.pinned-a.pinned)||(mode==='like'?(b.likes-a.likes):0)||(b.createdAt-a.createdAt));
 }
 function renderGallery(){
   const counts={};S.items.forEach(i=>counts[i.cls]=(counts[i.cls]||0)+1);
-  $('#tabs').innerHTML=[...CLASS_LIST,'전체'].map(c=>`<button class="tab" role="tab" data-cls="${c}" aria-selected="${S.gCls===c}">${c==='전체'?'전체 전시실':esc(c)+' 갤러리'}<span class="c">${c==='전체'?S.items.length:(counts[c]||0)}</span></button>`).join('');
+  $('#tabs').innerHTML=[...CLASS_LIST,'전체'].map(c=>`<button class="tab" role="tab" data-cls="${c}" aria-selected="${S.gCls===c}">${c==='전체'?'전체 전시실':esc(c)+' 갤러리'}${(S.admin||S.gCls===c)?`<span class="c">${c==='전체'?S.items.length:(counts[c]||0)}</span>`:''}</button>`).join('');
   const list=sortItems(S.items.filter(i=>S.gCls==='전체'||i.cls===S.gCls),$('#gal-sort').value);
   $('#gal-sub').textContent=`${CONFIG.GRADE} ${S.gCls==='전체'?'전체':S.gCls} · 작품 ${list.length}점`+(S.admin?' · 교사 모드(비공개 작품도 보임)':'');
   $('#gal-grid').innerHTML=list.length?list.map(cardHTML).join(''):
@@ -1161,7 +1380,7 @@ function cardHTML(it){
       <div class="foot"><span style="color:${S.liked.has(it.id)?'#c0362c':'inherit'}">${ICON.heart}${it.likes}</span><span>${ICON.chat}${it.comments.length}</span></div>
     </div></button>`;
 }
-$('#tabs').addEventListener('click',e=>{const t=e.target.closest('[data-cls]');if(t){S.gCls=t.dataset.cls;renderGallery()}});
+$('#tabs').addEventListener('click',e=>{const t=e.target.closest('[data-cls]');if(t){S.gCls=t.dataset.cls;if(S.admin)renderGallery();else{S.items=[];renderGallery();loadGallery()}}});
 $('#gal-sort').onchange=renderGallery;
 $('#b-refresh').onclick=()=>loadGallery();
 $('#gal-grid').addEventListener('click',e=>{const c=e.target.closest('.card');if(c)openDetail(c.dataset.id)});
@@ -1423,6 +1642,198 @@ document.addEventListener('keydown',e=>{
 });
 
 /* =====================================================================
+   추상화 배우기
+   ===================================================================== */
+const L={tab:'what',tree:0,seedC:1,seedH:1,G:{r:0,score:0,cur:null,answered:false},quiz:{}};
+const TREE=[
+`<svg viewBox="0 0 400 300"><rect width="400" height="300" fill="#e3eef6"/><circle cx="330" cy="60" r="26" fill="#f1c21b"/><rect y="245" width="400" height="55" fill="#8fb35e"/><path d="M192 250L208 250L205 175L215 150L209 148L201 168L198 140L193 141L195 172L186 152L181 155L194 180Z" fill="#7a5230"/><g fill="#4f8a3a"><circle cx="200" cy="115" r="48"/><circle cx="160" cy="135" r="34"/><circle cx="242" cy="135" r="34"/><circle cx="178" cy="92" r="30"/><circle cx="226" cy="90" r="30"/></g><g fill="#6aa84f"><circle cx="190" cy="100" r="18"/><circle cx="230" cy="122" r="16"/><circle cx="165" cy="128" r="14"/></g></svg>`,
+`<svg viewBox="0 0 400 300"><rect width="400" height="300" fill="#f4efe2"/><circle cx="330" cy="60" r="26" fill="#f1c21b"/><rect y="245" width="400" height="55" fill="#8fb35e"/><rect x="190" y="150" width="20" height="100" fill="#7a5230"/><circle cx="200" cy="120" r="70" fill="#4f8a3a"/></svg>`,
+`<svg viewBox="0 0 400 300"><rect width="400" height="300" fill="#f4efe2"/><g stroke="#141414" stroke-width="5" fill="none" stroke-linecap="round"><line x1="0" y1="250" x2="400" y2="250"/><path d="M200 250V120M200 190C180 170 160 160 140 120M200 170C225 150 240 130 262 100M200 140C190 120 185 100 180 70M200 150C215 130 222 105 228 80"/><circle cx="200" cy="120" r="70" stroke-width="3" stroke-dasharray="6 8"/><circle cx="330" cy="60" r="24" stroke-width="3"/></g></svg>`,
+`<svg viewBox="0 0 400 300"><rect width="400" height="300" fill="#f4efe2"/><rect x="127" y="50" width="67" height="70" fill="#1f4c9e"/><rect x="299" y="0" width="101" height="84" fill="#f1c21b"/><rect x="206" y="258" width="194" height="42" fill="#d22a2f"/><g fill="#141414"><rect x="194" y="0" width="12" height="300"/><rect x="0" y="246" width="400" height="12"/><rect x="0" y="120" width="299" height="9"/><rect x="290" y="0" width="9" height="129"/><rect x="120" y="40" width="7" height="89"/><rect x="194" y="84" width="206" height="7"/></g></svg>`];
+const TREE_CAP=['① 구상: 눈에 보이는 나무를 그대로 그렸어요. 잎, 가지, 해가 모두 알아볼 수 있어요.',
+ '② 단순화: 자잘한 부분을 빼고 큰 모양(원, 사각형)만 남겼어요.',
+ '③ 선으로: 나무의 뼈대와 방향만 선으로 나타냈어요.',
+ '④ 추상: 수직선·수평선과 색면만 남았어요. 이제 주인공은 나무가 아니라 균형과 리듬이에요.'];
+
+const ex=arr=>arr.map((o,i)=>cleanShape({id:'e'+i,rot:0,...o}));
+const EX={
+  dot:ex([{type:'dot',x:150,y:180,w:70,h:70,color:'black'},{type:'dot',x:420,y:140,w:28,h:28,color:'red'},{type:'dot',x:310,y:400,w:44,h:44,color:'blue'},{type:'dot',x:480,y:460,w:18,h:18,color:'black'},{type:'dot',x:190,y:480,w:14,h:14,color:'black'},{type:'dot',x:240,y:470,w:14,h:14,color:'black'},{type:'dot',x:290,y:460,w:14,h:14,color:'black'}]),
+  line:ex([{type:'hline',x:300,y:100,w:460,h:12,color:'black'},{type:'hline',x:100,y:340,w:300,h:12,rot:90,color:'black'},{type:'hline',x:340,y:290,w:300,h:10,rot:-35,color:'red'},{type:'curve',x:350,y:480,w:360,h:90,sw:11,color:'blue'}]),
+  face:ex([{type:'rect',x:170,y:190,w:210,h:210,color:'blue'},{type:'circle',x:430,y:220,w:180,h:180,color:'yellow'},{type:'triangle',x:330,y:450,w:230,h:180,color:'red'}]),
+  color:ex([{type:'rect',x:100,y:170,w:200,h:340,color:'red'},{type:'rect',x:300,y:170,w:200,h:340,color:'yellow'},{type:'rect',x:500,y:170,w:200,h:340,color:'blue'},{type:'rect',x:100,y:470,w:200,h:260,color:'black'},{type:'rect',x:300,y:470,w:200,h:260,color:'gray'},{type:'rect',x:500,y:470,w:200,h:260,color:'white'}]),
+  balSym:ex([{type:'rect',x:150,y:360,w:160,h:160,color:'gray'},{type:'rect',x:450,y:360,w:160,h:160,color:'gray'},{type:'circle',x:300,y:170,w:130,h:130,color:'blue'},{type:'hline',x:300,y:520,w:600,h:10,color:'black'}]),
+  balAsym:ex([{type:'rect',x:230,y:330,w:220,h:220,color:'gray'},{type:'circle',x:470,y:200,w:130,h:130,color:'red'},{type:'hline',x:300,y:520,w:600,h:10,color:'black'}]),
+  move:ex([{type:'curve',x:300,y:230,w:420,h:150,rot:-28,sw:13,color:'blue'},{type:'zigzag',x:320,y:440,w:360,h:80,rot:18,sw:10,color:'black'},{type:'triangle',x:130,y:120,w:110,h:100,rot:30,color:'red'}]),
+  rhythm:ex([0,1,2,3,4].map(i=>({type:'dot',x:90+i*105,y:220,w:20+i*16,h:20+i*16,color:'black'})).concat([0,1,2,3,4].map(i=>({type:'rect',x:90+i*105,y:440,w:56,h:56,rot:i*22,color:i%2?'blue':'red'})))),
+  contrast:ex([{type:'rect',x:230,y:320,w:360,h:360,color:'black'},{type:'dot',x:500,y:130,w:36,h:36,color:'yellow'}]),
+  emphasis:ex([150,300,450].flatMap(x=>[150,300,450].map(y=>({type:'dot',x,y,w:x===450&&y===150?90:64,h:x===450&&y===150?90:64,color:x===450&&y===150?'red':'gray'})))),
+  prop:ex([{type:'rect',x:185,y:300,w:370,h:600,color:'red'},{type:'rect',x:485,y:115,w:230,h:230,color:'yellow'},{type:'rect',x:485,y:415,w:230,h:370,color:'white'},{type:'hline',x:370,y:300,w:620,h:12,rot:90,color:'black'},{type:'hline',x:485,y:230,w:230,h:12,color:'black'}]),
+  unity:ex([{type:'circle',x:160,y:170,w:150,h:150,color:'blue'},{type:'circle',x:400,y:220,w:220,h:220,color:'blue',op:.7},{type:'circle',x:230,y:420,w:110,h:110,color:'blue',op:.5},{type:'circle',x:460,y:460,w:70,h:70,color:'blue'},{type:'circle',x:110,y:500,w:40,h:40,color:'yellow'}])
+};
+const ELEMENTS=[
+  {k:'dot',t:'점',d:'모든 그림의 시작이에요. 작은 점 하나에도 시선이 모이고, 여러 개가 모이면 선이나 면처럼 보여요.'},
+  {k:'line',t:'선',d:'점이 움직인 자국이에요. 수평선은 고요하고, 수직선은 곧고 힘차고, 사선은 움직이는 듯하고, 곡선은 부드러워요.'},
+  {k:'face',t:'면',d:'선으로 둘러싸인 넓이예요. 사각형·원 같은 기하학적인 면은 깔끔하고 차갑게, 자유로운 면은 따뜻하게 느껴져요.'},
+  {k:'color',t:'색',d:'빨강·노랑·파랑은 섞어서 만들 수 없는 삼원색이고, 검정·회색·흰색은 색기가 없는 무채색이에요. 진한 색은 무거워 보이고 밝은 색은 가벼워 보여요.'}
+];
+const PRINCIPLES=[
+  {k:'bal',t:'균형',m:1,d:'화면의 시각적 무게가 한쪽으로 쏠리지 않은 상태예요. 거울처럼 같은 대칭 균형과, 모양은 달라도 무게가 같은 비대칭 균형이 있어요.'},
+  {k:'move',t:'동세',m:1,d:'그림 속에서 느껴지는 움직임이에요. 사선, 곡선, 지그재그, 기울어진 도형이 동세를 만들어요.'},
+  {k:'rhythm',t:'리듬 · 반복',m:1,d:'같은 모양이나 색을 되풀이하거나 크기를 점점 바꾸면 음악처럼 흐름이 생겨요.'},
+  {k:'contrast',t:'대비',m:1,d:'크고 작음, 밝고 어두움처럼 반대되는 것을 함께 놓으면 서로가 더 돋보여요.'},
+  {k:'emphasis',t:'강조',m:0,d:'한 부분만 다른 색이나 크기로 만들어 시선을 모아요. 그림의 주인공을 정해 주는 원리예요.'},
+  {k:'prop',t:'비례',m:0,d:'부분과 부분, 부분과 전체의 크기 관계예요. 알맞은 비례는 화면을 안정되고 아름답게 만들어요.'},
+  {k:'unity',t:'통일과 변화',m:0,d:'비슷한 요소로 하나로 묶어 주고(통일), 크기나 진하기를 조금씩 바꿔 지루하지 않게 해요(변화).'}
+];
+const ARTISTS=[
+  {k:'mondrian',ko:'피트 몬드리안',en:'Piet Mondrian',y:'1872–1944',c:'네덜란드',st:'차가운 추상 · 신조형주의',pos:5,
+   d:'나무를 점점 단순하게 그리다가 마침내 수직선·수평선과 삼원색·무채색만 남겼어요. 세상의 질서와 균형을 가장 단순한 요소로 나타내려 했어요.',
+   w:'「회색 나무」(1911), 「빨강, 파랑, 노랑의 구성 II」(1930), 「브로드웨이 부기우기」(1942–43)',tip:'굵은 검정 가로선·세로선으로 칸을 나누고, 몇 칸만 삼원색으로 채워 비대칭 균형을 만들어 보세요.'},
+  {k:'malevich',ko:'카지미르 말레비치',en:'Kazimir Malevich',y:'1879–1935',c:'러시아 (키이우 출생)',st:'차가운 추상 · 절대주의',pos:15,
+   d:'흰 바탕에 검은 사각형 하나만 그린 작품으로 사람들을 깜짝 놀라게 했어요. 대상을 완전히 지우고 순수한 모양과 색의 느낌만 남기려 했어요.',
+   w:'「검은 사각형」(1915), 「흰색 위의 흰색」(1918)',tip:'사각형 몇 개를 비스듬히 띄워 보세요. 단순한 면도 기울이면 공간에 떠다니는 느낌이 생겨요.'},
+  {k:'yoo',ko:'유영국',en:'Yoo Youngkuk',y:'1916–2002',c:'한국',st:'기하학적 추상 · 한국 추상의 선구자',pos:32,
+   d:'고향 울진의 산과 바다를 선명한 색면과 기하학적인 모양으로 표현했어요. 평생 \'산\'을 주제로 그렸어요.',
+   w:'「산」 연작, 「작품」 연작',tip:'큰 삼각형과 반원을 겹쳐 산을 만들고, 강한 색 대비로 힘을 실어 보세요.'},
+  {k:'kim',ko:'김환기',en:'Kim Whanki',y:'1913–1974',c:'한국',st:'서정적 추상 · 점화',pos:60,
+   d:'뉴욕에서 고향과 친구들을 그리워하며 캔버스를 셀 수 없이 많은 푸른 점으로 채웠어요. 점 하나하나에 마음을 담은 한국 추상미술의 선구자예요.',
+   w:'「어디서 무엇이 되어 다시 만나랴」(1970), 「우주 05-IV-71 #200」(1971)',tip:'같은 색의 작은 점을 반복해 리듬을 만들고, 투명도를 조금씩 바꿔 깊이를 더해 보세요.'},
+  {k:'rothko',ko:'마크 로스코',en:'Mark Rothko',y:'1903–1970',c:'미국 (라트비아 출생)',st:'색면 추상',pos:70,
+   d:'커다란 캔버스에 경계가 흐릿한 색 덩어리 몇 개만 그렸어요. 보는 사람이 색 앞에서 깊은 감정을 느끼기를 바랐어요.',
+   w:'「오렌지와 노랑」(1956), 로스코 채플 연작(1964–67)',tip:'큰 사각형 두세 개를 겹치고 투명도를 높여 보세요. 색이 겹치며 은은한 분위기가 생겨요.'},
+  {k:'kandinsky',ko:'바실리 칸딘스키',en:'Wassily Kandinsky',y:'1866–1944',c:'러시아 (독일·프랑스에서 활동)',st:'뜨거운 추상 · 추상화의 선구자',pos:84,
+   d:'음악을 들으면 색이 보인다고 느낀 화가예요. 점·선·면과 색을 악기처럼 써서 그림으로 음악을 연주하려 했고, 『점·선·면』이라는 책도 썼어요.',
+   w:'「구성 VII」(1913), 「노랑-빨강-파랑」(1925), 「몇 개의 원」(1926)',tip:'좋아하는 음악을 떠올리며 곡선, 지그재그, 원을 리듬감 있게 흩어 놓아 보세요.'},
+  {k:'pollock',ko:'잭슨 폴록',en:'Jackson Pollock',y:'1912–1956',c:'미국',st:'추상표현주의 · 액션 페인팅',pos:97,
+   d:'캔버스를 바닥에 눕혀 놓고 그 주위를 돌며 물감을 떨어뜨리고 흩뿌렸어요. 그리는 몸짓 자체가 작품이 된 \'액션 페인팅\'이에요.',
+   w:'「가을의 리듬: 넘버 30」(1950), 「넘버 1A, 1948」(1948)',tip:'붓 모드의 \'물감 뿌리기\'로 여러 색을 겹쳐 뿌려 보세요. 팔 전체를 크게 움직이는 느낌으로!'}
+];
+const QUIZ=[
+  {q:'수직선·수평선과 삼원색으로 질서 있게 표현한 추상은?',o:['뜨거운 추상','차가운 추상','구상화','인상주의'],a:1,e:'차가운 추상(기하학적 추상)은 곧은 선과 기하학 도형으로 질서와 이성을 표현해요. 몬드리안이 대표 화가예요.'},
+  {q:'캔버스를 바닥에 눕히고 물감을 흩뿌린 \'액션 페인팅\' 화가는?',o:['피트 몬드리안','카지미르 말레비치','잭슨 폴록','유영국'],a:2,e:'잭슨 폴록은 그리는 몸짓 자체를 작품으로 만든 뜨거운 추상(추상표현주의) 화가예요.'},
+  {q:'음악처럼 그림을 그리려 했고 『점·선·면』이라는 책을 쓴 화가는?',o:['바실리 칸딘스키','마크 로스코','김환기','피트 몬드리안'],a:0,e:'칸딘스키는 색과 형태를 악기처럼 생각했어요. 뜨거운 추상의 선구자예요.'},
+  {q:'좌우 모양은 다르지만 시각적 무게가 같은 균형은?',o:['대칭 균형','비대칭 균형','방사 균형','불균형'],a:1,e:'예를 들어 왼쪽의 큰 회색 면과 오른쪽의 작은 빨간 원이 무게를 맞추면 비대칭 균형이에요.'},
+  {q:'같은 모양이나 색을 되풀이할 때 생기는 음악 같은 흐름은?',o:['대비','비례','리듬(반복)','강조'],a:2,e:'반복하거나 크기를 점점 바꾸면 리듬이 생겨요.'},
+  {q:'크기가 같다면 가장 무거워 보이는 색은?',o:['흰색','노랑','검정','연한 회색'],a:2,e:'진하고 어두운 색일수록 무거워 보여요. 그래서 작은 검정·빨강으로도 큰 면과 균형을 맞출 수 있어요.'},
+  {q:'고향을 그리워하며 수많은 푸른 점으로 캔버스를 채운 한국 추상화가는?',o:['유영국','김환기','칸딘스키','말레비치'],a:1,e:'김환기의 점화 「어디서 무엇이 되어 다시 만나랴」(1970)가 대표작이에요.'}
+];
+function genCold(seed){
+  const R=seedRand('c'+seed),cut=n=>{const a=[];for(let i=0;i<n;i++)a.push(Math.round(80+R()*440));a.sort((x,y)=>x-y);const b=[];a.forEach(v=>{if(!b.length||v-b[b.length-1]>70)b.push(v)});return [0,...b,600]};
+  const xs=cut(2+Math.floor(R()*2)),ys=cut(2+Math.floor(R()*2)),sh=[],cols=['red','blue','yellow','red','blue','gray','black'];
+  const nC=2+Math.floor(R()*3);
+  for(let k=0;k<nC;k++){const i=Math.floor(R()*(xs.length-1)),j=Math.floor(R()*(ys.length-1));sh.push({type:'rect',x:(xs[i]+xs[i+1])/2,y:(ys[j]+ys[j+1])/2,w:xs[i+1]-xs[i],h:ys[j+1]-ys[j],color:cols[Math.floor(R()*cols.length)]})}
+  xs.slice(1,-1).forEach(x=>sh.push({type:'hline',x,y:300,w:620,h:12,rot:90,color:'black'}));
+  ys.slice(1,-1).forEach(y=>sh.push({type:'hline',x:300,y,w:620,h:12,color:'black'}));
+  return sh.map((o,i)=>cleanShape({id:'gc'+i,rot:0,...o}));
+}
+function genHot(seed){
+  const R=seedRand('h'+seed),sh=[],cols=['red','blue','yellow','black','red','blue','gray'],brs=Object.keys(BRUSHES),n=5+Math.floor(R()*4);
+  for(let k=0;k<n;k++){
+    let x=60+R()*480,y=60+R()*480,a=R()*6.283;const pts=[[x,y]],m=10+Math.floor(R()*16),st=16+R()*14;
+    for(let i=0;i<m;i++){a+=(R()-.5)*1.3;x=clamp(x+Math.cos(a)*st,10,590);y=clamp(y+Math.sin(a)*st,10,590);pts.push([x,y])}
+    const b=makeBrush(pts,brs[Math.floor(R()*brs.length)],cols[Math.floor(R()*cols.length)],Math.round(6+R()*18),Math.round((0.55+R()*0.45)*100)/100);b.id='gh'+seed+'_'+k;sh.push(b);
+  }
+  const d=30+R()*40;
+  sh.push(cleanShape({id:'ghx1',type:'triangle',x:80+R()*440,y:80+R()*440,w:90,h:80,rot:20+R()*40,color:cols[Math.floor(R()*3)],op:.85}));
+  sh.push(cleanShape({id:'ghx2',type:'dot',x:80+R()*440,y:80+R()*440,w:d,h:d,rot:0,color:'black'}));
+  return sh;
+}
+const tags2=arr=>arr.map(t=>`<span class="tag">${esc(t)}</span>`).join('');
+function renderLearn(){
+  $$('#ltabs [data-l]').forEach(b=>b.setAttribute('aria-selected',b.dataset.l===L.tab));
+  const box=$('#lbody');
+  if(L.tab==='what'){
+    box.innerHTML=`<div class="lgrid2">
+      <div class="lcard"><h2>추상화는 '느낌'을 그린 그림</h2>
+        <p>추상화는 사람, 나무, 집처럼 눈에 보이는 대상을 그대로 그리지 않고 <b>점·선·면·색</b>만으로 생각과 느낌을 표현한 그림이에요. 그래서 "이게 뭘 그린 거지?"보다 "어떤 느낌이 들지?"를 묻는 게 더 잘 맞아요.</p>
+        <p>추상화는 1910년대 무렵 본격적으로 시작됐어요. 사진기가 대상을 똑같이 찍어 주게 되자, 화가들은 '그림만이 할 수 있는 일'을 찾기 시작했거든요.</p>
+        <h2 style="margin-top:18px">추상화를 볼 때 던지는 세 가지 질문</h2>
+        <div class="qs"><div><b>무엇이</b> 보이나요?<small>점·선·면·색</small></div><div><b>어떤 느낌</b>이 드나요?<small>고요함·신남·긴장</small></div><div><b>어떻게</b> 놓았나요?<small>균형·리듬·대비</small></div></div>
+      </div>
+      <div class="lcard"><h2>나무가 추상화가 되기까지</h2>
+        <div class="tree-box" id="tree-box">${TREE[L.tree]}</div>
+        <input type="range" id="tree-r" min="0" max="3" step="1" value="${L.tree}" aria-label="추상화 단계">
+        <div class="tree-steps"><span>구상</span><span>단순화</span><span>선</span><span>추상</span></div>
+        <p class="tree-cap" id="tree-cap">${TREE_CAP[L.tree]}</p>
+        <p class="hint">몬드리안도 실제로 나무를 점점 단순하게 그리다가 수직·수평선의 추상에 이르렀어요. 막대를 움직여 보세요.</p>
+      </div></div>
+      <div class="row center"><button class="btn btn-gold" data-l2="temp">다음: 차가운 추상과 뜨거운 추상 →</button></div>`;
+  }else if(L.tab==='temp'){
+    box.innerHTML=`<div class="lgrid2">
+      <div class="lcard cold"><span class="chip">차가운 추상 · 기하학적 추상</span><div class="card-frame">${artSVG(genCold(L.seedC))}</div>
+        <p>자로 잰 듯한 선과 도형으로 <b>질서와 이성</b>을 표현해요. 설계도나 수학 공식처럼 차분하고 정확한 느낌이에요.</p></div>
+      <div class="lcard hot"><span class="chip">뜨거운 추상 · 서정적 추상</span><div class="card-frame">${artSVG(genHot(L.seedH))}</div>
+        <p>자유로운 붓질과 흩뿌린 물감으로 <b>감정과 직관</b>을 표현해요. 음악이나 춤처럼 신나고 뜨거운 느낌이에요.</p></div>
+    </div>
+    <p class="hint" style="text-align:center;margin-top:10px">위 그림은 분석 엔진이 규칙에 따라 새로 만든 예시예요. 누를 때마다 바뀌어요.</p>
+    <div class="row center"><button class="btn" id="l-regen">다른 예시 만들기</button><button class="btn btn-gold" id="l-brush">작업실에서 뜨거운 추상 그려 보기</button></div>
+    <div class="cmp-wrap"><table class="cmp"><thead><tr><th></th><th>차가운 추상</th><th>뜨거운 추상</th></tr></thead><tbody>
+      <tr><td>표현하는 것</td><td>질서, 이성, 계산</td><td>감정, 직관, 즉흥</td></tr>
+      <tr><td>선</td><td>곧은 수직선·수평선</td><td>자유로운 곡선, 붓 자국, 흩뿌림</td></tr>
+      <tr><td>모양</td><td>정사각형·직사각형 같은 기하학 도형</td><td>정해지지 않은 자유로운 형태</td></tr>
+      <tr><td>색</td><td>삼원색과 무채색, 깔끔한 경계</td><td>여러 색이 번지고 겹침</td></tr>
+      <tr><td>비유하면</td><td>설계도, 수학</td><td>음악, 춤</td></tr>
+      <tr><td>대표 화가</td><td>몬드리안, 말레비치</td><td>칸딘스키, 폴록</td></tr>
+      <tr><td>작업실에서</td><td>'도형' 모드: 몬드리안 선 + 사각형</td><td>'붓' 모드: 여러 붓 + 투명도</td></tr>
+    </tbody></table></div>
+    <div class="lcard" style="margin-top:20px"><h2>게임: 차가울까, 뜨거울까?</h2><div id="game"></div></div>`;
+    renderGame();
+  }else if(L.tab==='elem'){
+    box.innerHTML=`<h2 class="lh" style="margin-top:0">조형 요소: 그림을 이루는 재료</h2>
+      <div class="egrid">${ELEMENTS.map(e=>`<div class="ecard"><div class="mini">${artSVG(EX[e.k])}</div><h3>${e.t}</h3><p>${e.d}</p></div>`).join('')}</div>
+      <h2 class="lh">조형 원리: 재료를 놓는 방법</h2>
+      <div class="pgrid">${PRINCIPLES.map(p=>`<div class="ecard"><div class="mini" id="mini-${p.k}">${artSVG(p.k==='bal'?EX.balAsym:EX[p.k])}</div>
+        <h3>${p.t}</h3>${p.m?'<span class="measured">작업실 분석 엔진이 재요</span>':''}<p>${p.d}</p>
+        ${p.k==='bal'?'<button class="btn btn-sm" id="bal-tg" data-s="asym">지금: 비대칭 균형 · 대칭으로 바꾸기</button>':''}</div>`).join('')}</div>
+      <div class="row center"><button class="btn btn-gold" data-go="studio">작업실에서 직접 써 보기 →</button></div>`;
+  }else if(L.tab==='artist'){
+    box.innerHTML=`<div class="lcard"><h2>화가 지도: 차가운 추상 ↔ 뜨거운 추상</h2>
+      <div class="spectrum"><div class="sp-track"></div>${ARTISTS.map((a,i)=>`<button class="sp-dot ${i%2?'down':'up'}" style="left:${a.pos}%" data-art="${a.k}" aria-label="${a.ko}"><span>${a.ko}</span></button>`).join('')}</div>
+      <div class="sp-ends"><span>← 차가운 · 질서</span><span>감정 · 뜨거운 →</span></div>
+      <p class="hint">위치는 대략적인 경향이에요. 한 화가도 시기에 따라 그림이 바뀌기도 하고, 학자마다 다르게 나누기도 해요. 점을 누르면 화가 카드로 이동해요.</p></div>
+      <div class="agrid">${ARTISTS.map(a=>{const t=a.pos<40?'cold':a.pos>75?'hot':'mid',bg=a.pos<40?'#2f5ea8':a.pos>75?'#b8392f':'#6a5a8c';
+        return `<article class="acard" id="art-${a.k}"><div class="mono" style="background:${bg}">${a.ko[0]}</div><div>
+          <h3>${a.ko} <small>${a.en}</small></h3><p class="meta">${a.y} · ${a.c}</p><span class="chip ${t}">${a.st}</span>
+          <p>${a.d}</p><p><b>대표작</b> ${a.w}</p><p><b style="color:var(--gold-hi)">작업실 팁</b> ${a.tip}</p>
+          <a href="https://artsandculture.google.com/search?q=${encodeURIComponent(a.en)}" target="_blank" rel="noopener">구글 아트 앤 컬처에서 작품 보기 ↗</a></div></article>`}).join('')}</div>`;
+  }else{
+    const sc=Object.entries(L.quiz).filter(([i,v])=>QUIZ[i].a===v).length,done=Object.keys(L.quiz).length;
+    box.innerHTML=`<div class="quiz">${QUIZ.map((q,i)=>{const pick=L.quiz[i];return `<div class="qitem"><h3>Q${i+1}. ${q.q}</h3><div class="qopts">${q.o.map((o,j)=>{
+        const c=pick==null?'':j===q.a?' right':j===pick?' wrong':'';return `<button class="btn qopt${c}" data-q="${i}" data-o="${j}" ${pick!=null?'disabled':''}>${o}</button>`}).join('')}</div>
+        ${pick!=null?`<p class="qex">${pick===q.a?'<b class="fb-ok">정답!</b> ':'<b class="fb-no">아쉬워요.</b> '}${q.e}</p>`:''}</div>`}).join('')}
+      <div class="lcard" style="text-align:center"><div class="qscore">${done}문제 중 ${sc}개 정답${done===QUIZ.length?(sc>=6?' · 큐레이터 자격 획득!':' · 틀린 부분을 다시 읽어 봐요'):''}</div>
+      <div class="row center"><button class="btn" id="q-reset">다시 풀기</button><button class="btn btn-gold" data-go="studio">신진 화가로 작품 그리러 가기 →</button></div></div></div>`;
+  }
+}
+function renderGame(){
+  const g=$('#game');if(!g)return;const G=L.G;
+  if(G.r>=8){g.innerHTML=`<div class="game-end"><b>${G.score} / 8</b><p>${G.score>=7?'큐레이터 합격! 눈이 아주 날카로워요.':G.score>=5?'좋아요! 표를 한 번 더 보면 완벽해요.':'위의 표를 다시 읽고 도전해 봐요.'}</p><button class="btn" id="g-re">다시 하기</button></div>`;return}
+  if(!G.cur)G.cur={hot:Math.random()<.5,seed:Math.floor(Math.random()*1e6)};
+  g.innerHTML=`<div class="game-grid"><div class="card-frame">${artSVG(G.cur.hot?genHot(G.cur.seed):genCold(G.cur.seed))}</div>
+    <div><p class="hint">${G.r+1} / 8 · 점수 ${G.score}</p><p>이 그림은 어느 쪽에 더 가까울까요?</p>
+    <div class="row"><button class="btn" data-ga="cold" ${G.answered?'disabled':''}>차가운 추상</button><button class="btn" data-ga="hot" ${G.answered?'disabled':''}>뜨거운 추상</button></div>
+    <p id="g-fb"></p></div></div>`;
+}
+$('#ltabs').addEventListener('click',e=>{const b=e.target.closest('[data-l]');if(b){L.tab=b.dataset.l;renderLearn()}});
+$('#lbody').addEventListener('input',e=>{if(e.target.id==='tree-r'){L.tree=+e.target.value;$('#tree-box').innerHTML=TREE[L.tree];$('#tree-cap').textContent=TREE_CAP[L.tree]}});
+$('#lbody').addEventListener('click',e=>{
+  const t=e.target;
+  const l2=t.closest('[data-l2]');if(l2){L.tab=l2.dataset.l2;renderLearn();window.scrollTo(0,0);return}
+  if(t.id==='l-regen'){L.seedC++;L.seedH++;renderLearn();return}
+  if(t.id==='l-brush'){setMode('brush');if(!S.nick){toast('먼저 반과 닉네임을 정해 주세요.');go('intro')}else go('studio');return}
+  const ga=t.closest('[data-ga]');
+  if(ga&&!L.G.answered){const G=L.G,ok=(ga.dataset.ga==='hot')===G.cur.hot;G.answered=true;if(ok)G.score++;
+    $$('[data-ga]').forEach(b=>b.disabled=true);
+    $('#g-fb').innerHTML=`<b class="${ok?'fb-ok':'fb-no'}">${ok?'정답!':'아쉬워요.'}</b> ${G.cur.hot?'자유로운 붓 자국과 흩뿌린 물감, 기울어진 모양이 감정을 드러내는 뜨거운 추상이에요.':'곧은 수직·수평선과 사각형 색면이 질서를 보여 주는 차가운 추상이에요.'} <button class="btn btn-sm" id="g-next">다음 그림 →</button>`;return}
+  if(t.id==='g-next'){L.G.r++;L.G.cur=null;L.G.answered=false;renderGame();return}
+  if(t.id==='g-re'){L.G={r:0,score:0,cur:null,answered:false};renderGame();return}
+  if(t.id==='bal-tg'){const sym=t.dataset.s==='asym';t.dataset.s=sym?'sym':'asym';$('#mini-bal').innerHTML=artSVG(sym?EX.balSym:EX.balAsym);t.textContent=sym?'지금: 대칭 균형 · 비대칭으로 바꾸기':'지금: 비대칭 균형 · 대칭으로 바꾸기';return}
+  const dot=t.closest('[data-art]');if(dot){const c=$('#art-'+dot.dataset.art);c.scrollIntoView({behavior:'smooth',block:'center'});c.classList.add('flash');setTimeout(()=>c.classList.remove('flash'),1600);return}
+  const qo=t.closest('[data-q]');if(qo){L.quiz[qo.dataset.q]=+qo.dataset.o;const y=window.scrollY;renderLearn();window.scrollTo(0,y);return}
+  if(t.id==='q-reset'){L.quiz={};renderLearn();window.scrollTo(0,0)}
+});
+
+/* =====================================================================
    시작
    ===================================================================== */
 (function boot(){
@@ -1432,7 +1843,7 @@ document.addEventListener('keydown',e=>{
   if(d&&Array.isArray(d.shapes)){S.shapes=d.shapes.map(cleanShape).filter(Boolean);S.editing=d.editing||null}
   updateWho();
   const h=location.hash.slice(1);
-  go(['studio','gallery','admin'].includes(h)?h:(S.nick?'studio':'intro'));
+  go(['studio','gallery','admin','learn'].includes(h)?h:(S.nick?'studio':'intro'));
 })();
 </script>
 </body>
