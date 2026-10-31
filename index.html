@@ -1,0 +1,1439 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>루브르 신진 화가展</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;500;700&family=Nanum+Myeongjo:wght@700;800&display=swap" rel="stylesheet">
+<style>
+/* 레이아웃: 어두운 전시실 벽 + 금빛 액자 캔버스. 작업실은 좌(조형 요소) · 중(캔버스) · 우(분석 엔진) 3단 */
+:root{
+  --wall:#16151c; --wall-2:#1e1c26; --panel:#24212e; --panel-2:#2c2938; --line:#3b3747;
+  --gold:#c9a24a; --gold-hi:#ecd18a; --gold-deep:#7d5f1f;
+  --ivory:#f4efe2; --ink:#efe9dc; --muted:#a49e94; --dim:#7b7570;
+  --alert:#e2483c; --ok:#74c493; --warn:#e9b949; --tape:#f1c21b;
+  --f-display:"Nanum Myeongjo","Batang","AppleMyungjo",serif;
+  --f-body:"IBM Plex Sans KR","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
+  --f-news:"Black Han Sans","Malgun Gothic",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  --r:10px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  background:radial-gradient(ellipse 90% 55% at 50% -12%,#2c2734 0%,var(--wall) 62%) fixed,var(--wall);
+  color:var(--ink);font:15px/1.6 var(--f-body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
+[hidden]{display:none!important}
+h1,h2,h3{text-wrap:balance;margin:0}
+.wrap{max-width:1440px;margin:0 auto}
+
+/* ---------- 버튼 ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--panel);
+  padding:8px 14px;border-radius:8px;transition:background .15s,border-color .15s,transform .1s;white-space:nowrap}
+.btn:hover{background:var(--panel-2);border-color:#544e62}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-gold{background:linear-gradient(180deg,var(--gold-hi),var(--gold) 55%,#a8832f);color:#231a06;border-color:#e6c46e;font-weight:700}
+.btn-gold:hover{background:linear-gradient(180deg,#f5dc9b,#d4ad55 55%,#b18a33);border-color:#f0d27f}
+.btn-ghost{background:transparent;border-color:transparent;color:var(--muted)}
+.btn-ghost:hover{background:var(--panel);color:var(--ink)}
+.btn-danger{border-color:#6b2c2a;color:#ffb3aa}
+.btn-danger:hover{background:#3a1d1f;border-color:var(--alert)}
+.btn-sm{padding:5px 10px;font-size:13px;border-radius:6px}
+.icon{width:16px;height:16px;flex:none}
+
+/* ---------- 상단바 ---------- */
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(22,21,28,.92);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:10px max(16px,env(safe-area-inset-left,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--wall)}
+.topbar .wrap{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:baseline;gap:10px;margin-right:auto;min-width:0}
+.brand b{font-family:var(--f-display);font-weight:800;font-size:19px;letter-spacing:.18em;color:var(--gold-hi)}
+.brand span{color:var(--muted);font-size:13px}
+.nav{display:flex;gap:4px}
+.nav .btn{background:transparent;border-color:transparent}
+.nav .btn[aria-current="page"]{background:var(--panel);border-color:var(--line);color:var(--gold-hi)}
+.who{font-size:13px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 12px}
+.who b{color:var(--ink);font-weight:500}
+.demo-bar{background:#2b2414;border:1px solid #5d4b22;color:#f0d79a;font-size:13px;border-radius:8px;padding:6px 12px;margin:12px auto 0;max-width:1440px}
+
+/* ---------- 인트로 ---------- */
+.ticker{overflow:hidden;background:var(--alert);color:#fff;margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px)));white-space:nowrap;font-family:var(--f-news);font-size:15px;letter-spacing:.04em}
+.ticker div{display:inline-block;padding:6px 0;animation:tick 28s linear infinite}
+.ticker span{padding:0 28px}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.intro{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:44px;align-items:center;padding-block:44px 60px}
+.crime{position:relative;display:grid;place-items:center;padding:20px}
+.frame{position:relative;width:min(100%,460px);aspect-ratio:4/5;padding:26px;border-radius:4px;
+  background:linear-gradient(135deg,#f3d88f,#b98c33 30%,#e9c977 50%,#8d6722 75%,#d9b45f);
+  box-shadow:0 30px 60px rgba(0,0,0,.55),inset 0 0 0 3px #6e5016,inset 0 0 0 9px #e2c070,inset 0 0 0 12px #7a5a1b}
+.frame-in{width:100%;height:100%;background:#2a2730;box-shadow:inset 0 6px 22px rgba(0,0,0,.7);position:relative;overflow:hidden}
+.frame-in::before{content:"";position:absolute;inset:12%;border:2px dashed rgba(236,209,138,.25)}
+.frame-in::after{content:"?";position:absolute;inset:0;display:grid;place-items:center;font-family:var(--f-display);font-size:110px;color:rgba(236,209,138,.12)}
+.tape{position:absolute;left:-12%;right:-12%;height:38px;background:var(--tape);color:#111;font-family:var(--f-news);font-size:16px;
+  display:flex;align-items:center;gap:26px;white-space:nowrap;overflow:hidden;box-shadow:0 6px 14px rgba(0,0,0,.45);z-index:2}
+.tape.t1{top:38%;transform:rotate(-14deg)}
+.tape.t2{top:58%;transform:rotate(9deg)}
+.label-card{position:absolute;right:2%;bottom:3%;background:var(--ivory);color:#2a241a;padding:10px 14px;font-size:12px;line-height:1.45;box-shadow:0 8px 20px rgba(0,0,0,.4);transform:rotate(2deg);z-index:3}
+.label-card b{font-family:var(--f-display);font-size:14px;display:block}
+.label-card s{color:#a33}
+.case{background:linear-gradient(180deg,var(--panel),var(--wall-2));border:1px solid var(--line);border-radius:14px;padding:28px;box-shadow:0 20px 40px rgba(0,0,0,.35)}
+.case-no{font-family:var(--f-mono);font-size:12px;color:var(--alert);letter-spacing:.12em}
+.case h1{font-family:var(--f-news);font-weight:400;font-size:clamp(30px,4.2vw,46px);line-height:1.15;margin:8px 0 14px}
+.case h1 em{font-style:normal;color:var(--alert)}
+.case p{color:#d8d1c3;margin:0 0 12px;max-width:62ch}
+.mission-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0 22px}
+.mission-strip div{border:1px solid var(--line);border-radius:8px;padding:10px;background:rgba(0,0,0,.18)}
+.mission-strip b{display:block;font-family:var(--f-display);color:var(--gold-hi);font-size:16px}
+.mission-strip span{font-size:12.5px;color:var(--muted)}
+.form-row{display:grid;grid-template-columns:150px 1fr;gap:10px;margin-bottom:10px}
+.field label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:4px;letter-spacing:.04em}
+.input{width:100%;background:#15141a;border:1px solid var(--line);border-radius:8px;padding:10px 12px;outline:none}
+.input:focus{border-color:var(--gold)}
+.hint{font-size:12.5px;color:var(--muted);margin:6px 0 0}
+.err{color:#ff9d92;font-size:13px;min-height:1.2em;margin:6px 0 0}
+.enter{width:100%;padding:13px;font-size:16px;margin-top:8px}
+.teacher-link{margin-top:14px;text-align:right}
+
+/* ---------- 작업실 ---------- */
+.studio{display:grid;grid-template-columns:232px minmax(0,1fr) 318px;gap:18px;padding-block:18px 40px;align-items:start}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.panel h2{font-family:var(--f-display);font-size:15px;color:var(--gold-hi);letter-spacing:.06em;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.panel h2 small{font-family:var(--f-body);color:var(--muted);font-size:12px;font-weight:400;letter-spacing:0}
+.lib-group+.lib-group{margin-top:14px}
+.lib-group h3{font-size:12px;color:var(--muted);font-weight:500;letter-spacing:.12em;margin-bottom:6px}
+.lib-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.tile{aspect-ratio:1;background:#1a1920;border:1px solid var(--line);border-radius:8px;display:grid;place-items:center;padding:6px;touch-action:none;user-select:none;position:relative}
+.tile:hover{border-color:var(--gold);background:#201e27}
+.tile svg{width:100%;height:100%;pointer-events:none}
+.tile .tip{position:absolute;inset:auto 0 -2px;font-size:10px;color:var(--muted);text-align:center;pointer-events:none;line-height:1.2;transform:translateY(100%);opacity:0;transition:opacity .15s}
+.tile:hover .tip{opacity:1}
+.palette{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.sw{height:38px;border-radius:8px;border:2px solid transparent;position:relative;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
+.sw[aria-pressed="true"]{border-color:var(--gold-hi);box-shadow:0 0 0 2px #000 inset}
+.sw span{position:absolute;inset:auto 0 3px;font-size:10.5px;text-align:center;font-weight:700}
+.lib-note{font-size:12px;color:var(--muted);margin:10px 0 0;line-height:1.5}
+
+.stage{min-width:0}
+.stage-bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.stage-bar .spacer{flex:1}
+.editing-chip{font-size:13px;background:#2b2414;border:1px solid #5d4b22;color:#f0d79a;border-radius:999px;padding:4px 12px}
+.easel{display:grid;place-items:center}
+.gold-frame{width:min(100%,calc(100vh - 210px),720px);min-width:280px;padding:clamp(12px,2.4vw,24px);border-radius:3px;
+  background:linear-gradient(135deg,#f3d88f,#b98c33 28%,#efd184 50%,#8d6722 76%,#d9b45f);
+  box-shadow:0 26px 50px rgba(0,0,0,.55),inset 0 0 0 2px #6e5016,inset 0 0 0 7px #e2c070,inset 0 0 0 9px #7a5a1b}
+#canvas{display:block;width:100%;height:auto;aspect-ratio:1;background:var(--ivory);touch-action:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
+#canvas .shape{cursor:grab}
+#canvas .h-resize{cursor:nwse-resize}
+#canvas .h-rot{cursor:grab}
+.sel-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;margin-top:12px;min-height:40px}
+.sel-bar .mini-sw{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);padding:0}
+.sel-bar .mini-sw[aria-pressed="true"]{border-color:var(--gold-hi)}
+.sel-bar .sep{width:1px;height:22px;background:var(--line);margin:0 4px}
+.sel-empty{color:var(--dim);font-size:13px}
+
+.meter-box{display:grid;gap:12px}
+.status{border-radius:10px;padding:12px;border:1px solid var(--line);background:#1b1a21}
+.status .k{font-size:12px;letter-spacing:.1em;color:var(--muted)}
+.status .v{font-family:var(--f-display);font-size:19px;margin:2px 0 4px}
+.status p{margin:0;font-size:13.5px;color:#d9d2c4}
+.status.good{border-color:#3e6b4f;background:#18241d}.status.good .v{color:var(--ok)}
+.status.warn{border-color:#6b5a2a;background:#262114}.status.warn .v{color:var(--warn)}
+.status.bad{border-color:#6b2f2a;background:#271817}.status.bad .v{color:#ff8e83}
+.status.flash{animation:flash 1.2s ease}
+@keyframes flash{0%{box-shadow:0 0 0 0 rgba(236,209,138,.8)}100%{box-shadow:0 0 0 14px rgba(236,209,138,0)}}
+.seesaw svg{width:100%;height:auto;display:block}
+.seesaw .nums{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:12px;color:var(--muted);margin-top:-4px}
+.bars{display:grid;gap:7px}
+.bar{display:grid;grid-template-columns:44px 1fr 32px;gap:8px;align-items:center;font-size:12.5px}
+.bar .track{height:8px;background:#15141a;border-radius:99px;overflow:hidden}
+.bar .fill{height:100%;background:linear-gradient(90deg,var(--gold-deep),var(--gold-hi));border-radius:99px;transition:width .3s}
+.bar .n{font-family:var(--f-mono);color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{font-size:12px;border:1px solid #5d4b22;color:var(--gold-hi);background:#221d12;border-radius:999px;padding:2px 9px}
+.tags .none{color:var(--dim);font-size:12.5px}
+.missions{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.missions li{display:flex;gap:8px;font-size:13px;align-items:flex-start;color:#cfc8ba}
+.missions .ck{flex:none;width:18px;height:18px;border-radius:5px;border:1.5px solid var(--line);display:grid;place-items:center;margin-top:2px;font-size:12px}
+.missions li.done{color:var(--ink)}
+.missions li.done .ck{background:var(--ok);border-color:var(--ok);color:#10261a}
+.submit-big{width:100%;padding:12px;font-size:16px}
+
+/* ---------- 갤러리 ---------- */
+.gal-head{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;padding-block:28px 14px}
+.gal-head h1{font-family:var(--f-display);font-weight:800;font-size:clamp(26px,3.4vw,38px)}
+.gal-head p{margin:4px 0 0;color:var(--muted)}
+.gal-head .grow{flex:1;min-width:240px}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-bottom:22px}
+.tab{background:none;border:none;border-bottom:2px solid transparent;padding:10px 14px;color:var(--muted);margin-bottom:-1px}
+.tab[aria-selected="true"]{color:var(--gold-hi);border-bottom-color:var(--gold)}
+.tab .c{font-family:var(--f-mono);font-size:11px;margin-left:4px;color:var(--dim)}
+.gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:30px 24px;padding-bottom:60px}
+.card{position:relative;cursor:pointer;background:none;border:none;padding:0;text-align:left;display:flex;flex-direction:column;gap:12px}
+.card-frame{padding:12px;background:linear-gradient(135deg,#f3d88f,#b98c33 30%,#efd184 52%,#8d6722 78%,#d9b45f);
+  box-shadow:0 14px 28px rgba(0,0,0,.5),inset 0 0 0 2px #6e5016,inset 0 0 0 5px #e2c070,inset 0 0 0 6px #7a5a1b;transition:transform .2s}
+.card:hover .card-frame{transform:translateY(-3px)}
+.card-frame svg{display:block;width:100%;height:auto}
+.plaque{background:#ece5d3;color:#2a241a;padding:10px 12px;border-radius:2px;box-shadow:0 4px 10px rgba(0,0,0,.35)}
+.plaque h3{font-family:var(--f-display);font-size:16px;line-height:1.3;overflow-wrap:anywhere}
+.plaque .artist{font-size:12.5px;color:#5c5242;margin:2px 0 6px}
+.plaque .tags .tag{background:#f7f1e2;border-color:#c9b27a;color:#6b5218;font-size:11px}
+.plaque .foot{display:flex;gap:12px;margin-top:8px;font-size:12px;color:#6c604e;align-items:center}
+.plaque .foot span{display:inline-flex;gap:4px;align-items:center}
+.ribbon{position:absolute;top:-8px;left:-8px;z-index:2;background:var(--alert);color:#fff;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:3px;box-shadow:0 4px 10px rgba(0,0,0,.4);letter-spacing:.04em}
+.card.is-hidden{opacity:.45}
+.card.is-hidden::after{content:"비공개";position:absolute;top:10px;right:10px;background:#000;color:#fff;font-size:11px;padding:2px 8px;border-radius:4px}
+.empty{grid-column:1/-1;text-align:center;padding:60px 20px;border:1px dashed var(--line);border-radius:14px;color:var(--muted)}
+.empty b{display:block;font-family:var(--f-display);font-size:20px;color:var(--ink);margin-bottom:6px}
+
+/* ---------- 모달 ---------- */
+.modal{position:fixed;inset:0;z-index:50;background:rgba(8,7,10,.78);display:grid;place-items:center;padding:20px max(16px,env(safe-area-inset-left,0px));overflow:auto}
+.sheet{background:var(--wall-2);border:1px solid var(--line);border-radius:14px;width:min(100%,900px);padding:22px;position:relative;box-shadow:0 30px 70px rgba(0,0,0,.6)}
+.sheet.narrow{width:min(100%,460px)}
+.sheet h2{font-family:var(--f-display);font-size:22px;margin-bottom:12px}
+.x{position:absolute;top:10px;right:10px}
+.detail{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:22px}
+.detail .card-frame{padding:16px}
+.detail-info{min-width:0;display:flex;flex-direction:column;gap:12px}
+.detail-info h2{margin:0}
+.detail-info .artist{color:var(--muted);margin-top:-6px}
+.note{font-family:var(--f-display);color:#e3dccd;border-left:2px solid var(--gold);padding-left:10px;margin:0}
+.mini-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.mini-stats div{background:#1a1920;border:1px solid var(--line);border-radius:8px;padding:6px;text-align:center}
+.mini-stats b{display:block;font-family:var(--f-mono);font-size:16px;color:var(--gold-hi)}
+.mini-stats span{font-size:11px;color:var(--muted)}
+.comments{display:grid;gap:6px;max-height:210px;overflow:auto;padding-right:4px}
+.cmt{background:#1a1920;border-radius:8px;padding:7px 10px;font-size:13.5px;display:flex;gap:8px;align-items:flex-start}
+.cmt b{color:var(--gold-hi);font-weight:500;flex:none}
+.cmt p{margin:0;flex:1;min-width:0;overflow-wrap:anywhere}
+.cmt-form{display:flex;gap:6px}
+.like.on{border-color:var(--alert);color:#ffb0a8;background:#2c1717}
+.box{border:1px solid var(--line);border-radius:10px;padding:12px;background:#1a1920}
+.box h3{font-size:13px;color:var(--muted);font-weight:500;margin-bottom:8px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.submit-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:20px}
+.done-art{width:min(100%,320px);margin:0 auto}
+
+/* ---------- 교사 관리실 ---------- */
+.admin{padding-block:24px 60px;display:grid;gap:18px}
+.admin-top{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.admin-top h1{font-family:var(--f-display);font-size:28px;margin-right:auto}
+.admin-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+.count-bars{display:grid;gap:8px}
+.cbar{display:grid;grid-template-columns:44px 1fr 70px;gap:10px;align-items:center;font-size:13px}
+.cbar .track{height:14px;background:#15141a;border-radius:4px;overflow:hidden;display:flex}
+.cbar .vis{background:var(--gold)}
+.cbar .hid{background:#5a5363}
+.cbar .n{font-family:var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums;text-align:right}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:760px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+th{font-size:12px;color:var(--muted);font-weight:500;background:var(--panel);position:sticky;top:0}
+td.thumb{width:62px}
+td.thumb svg{width:48px;height:48px;display:block;border:2px solid var(--gold)}
+tr.hid td{opacity:.5}
+tr.hid td.act{opacity:1}
+.act{white-space:nowrap}
+.pill{font-size:11px;border-radius:999px;padding:1px 8px;border:1px solid var(--line);color:var(--muted)}
+.pill.pin{border-color:var(--alert);color:#ffb0a8}
+.pill.off{border-color:#5a5363;color:#bdb5c8}
+.export .row+.row{margin-top:8px}
+.progress{font-size:13px;color:var(--gold-hi);min-height:1.3em;margin-top:8px}
+
+/* ---------- 감상 수업 모드 ---------- */
+.present{position:fixed;inset:0;z-index:60;background:#0c0b0f;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:4vw;align-items:center;padding:4vh max(4vw,env(safe-area-inset-left,0px))}
+.present .card-frame{width:min(100%,82vh);margin:0 auto;padding:clamp(14px,2vw,28px)}
+.present-info h2{font-family:var(--f-display);font-size:clamp(28px,3.6vw,54px);line-height:1.2}
+.present-info .artist{font-size:clamp(16px,1.6vw,22px);color:var(--muted);margin:8px 0 18px}
+.present-info .tags .tag{font-size:clamp(14px,1.3vw,18px);padding:4px 14px}
+.present-info .note{font-size:clamp(15px,1.4vw,20px);margin-top:18px}
+.present-info .mini-stats b{font-size:22px}
+.present-ctrl{position:absolute;bottom:max(16px,env(safe-area-inset-bottom,0px));right:max(16px,env(safe-area-inset-right,0px));display:flex;gap:6px;align-items:center}
+.present-ctrl .pos{font-family:var(--f-mono);color:var(--muted);margin:0 8px}
+
+/* ---------- 토스트 / 고스트 ---------- */
+.toast{position:fixed;left:50%;bottom:max(24px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:80;background:#f4efe2;color:#1d1a14;padding:10px 18px;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.5);font-size:14px;max-width:calc(100% - 32px)}
+.ghost{position:fixed;z-index:90;width:70px;height:70px;pointer-events:none;transform:translate(-50%,-50%);opacity:.85;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5))}
+
+/* ---------- 반응형 ---------- */
+@media (max-width:1180px){
+  .studio{grid-template-columns:210px minmax(0,1fr)}
+  .analysis{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+  .analysis .panel{margin:0!important}
+}
+@media (max-width:860px){
+  .intro{grid-template-columns:1fr;gap:20px;padding-block:24px 40px}
+  .frame{width:min(100%,330px)}
+  .detail,.submit-grid,.admin-grid{grid-template-columns:1fr}
+  .present{grid-template-columns:1fr;overflow:auto;align-content:start}
+}
+@media (max-width:720px){
+  .studio{grid-template-columns:1fr}
+  .lib-grid{grid-template-columns:repeat(6,1fr)}
+  .palette{grid-template-columns:repeat(6,1fr)}
+  .gold-frame{min-width:0}
+  .form-row{grid-template-columns:1fr}
+  .mission-strip{grid-template-columns:1fr}
+  .brand span{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand"><b>LOUVRE</b><span>특별전 · 신진 화가展</span></div>
+    <nav class="nav" aria-label="화면 이동">
+      <button class="btn" data-go="studio" id="nav-studio">작업실</button>
+      <button class="btn" data-go="gallery" id="nav-gallery">학급 갤러리</button>
+      <button class="btn" data-go="admin" id="nav-admin" hidden>교사 관리실</button>
+    </nav>
+    <span class="who" id="who" hidden></span>
+    <button class="btn btn-ghost btn-sm" id="btn-teacher" title="교사 전용" aria-label="교사 전용 관리">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      <span id="teacher-label">교사</span>
+    </button>
+  </div>
+</header>
+<div class="demo-bar" id="demo-bar" hidden>체험 모드: 작품이 이 컴퓨터(브라우저)에만 저장됩니다. 반 전체가 함께 쓰려면 <b>서버_설치_안내.txt</b>대로 구글 시트를 연결하세요. (체험용 교사 비밀번호 1234)</div>
+
+<!-- ================= 1단계: 인트로 ================= -->
+<section id="screen-intro" class="screen">
+  <div class="ticker" aria-hidden="true"><div>
+    <span>속보 · 루브르 미술관 대표 추상화 도난</span><span>특별전시회 일주일 앞으로</span><span>큐레이터팀, 신진 화가 긴급 모집</span><span>조형의 원리로 빈 벽을 채워라</span>
+    <span>속보 · 루브르 미술관 대표 추상화 도난</span><span>특별전시회 일주일 앞으로</span><span>큐레이터팀, 신진 화가 긴급 모집</span><span>조형의 원리로 빈 벽을 채워라</span>
+  </div></div>
+  <div class="wrap intro">
+    <div class="crime" aria-hidden="true">
+      <div class="frame"><div class="frame-in"></div></div>
+      <div class="tape t1"><span>출입금지 · 도난 현장 · POLICE LINE · 출입금지 · 도난 현장 · POLICE LINE · 출입금지</span></div>
+      <div class="tape t2"><span>DO NOT CROSS · 수사 중 · DO NOT CROSS · 수사 중 · DO NOT CROSS · 수사 중</span></div>
+      <div class="label-card"><b>추상 구성 No.7</b>캔버스에 유채 · 상설 전시<br><s>전시 중</s> → 분실</div>
+    </div>
+    <div class="case">
+      <div class="case-no">사건 파일 LV-2026-1031 · 긴급</div>
+      <h1><em>비상!</em> 루브르의 추상화가<br>사라졌습니다</h1>
+      <p>루브르 미술관의 대표 추상화 작품이 흔적도 없이 사라졌습니다. 다음 주 특별전시회를 위해 큐레이터팀은 <b>신진 화가인 여러분</b>의 작품으로 전시실을 채우기로 결정했습니다.</p>
+      <p>점·선·면과 삼원색, 무채색만으로 나만의 추상화를 그려 주세요. 분석 엔진이 작품의 무게중심을 실시간으로 알려 줍니다.</p>
+      <div class="mission-strip">
+        <div><b>균형</b><span>무게중심을 가운데로</span></div>
+        <div><b>동세</b><span>대각선·곡선으로 움직임</span></div>
+        <div><b>리듬</b><span>반복으로 흐름 만들기</span></div>
+      </div>
+      <form id="login-form" autocomplete="off">
+        <div class="form-row">
+          <div class="field"><label for="in-cls">우리 반</label><select id="in-cls" class="input"></select></div>
+          <div class="field"><label for="in-nick">작가 닉네임</label><input id="in-nick" class="input" maxlength="12" placeholder="예: 피카소2세, 선과면의마술사"></div>
+        </div>
+        <p class="hint">이름이나 번호는 쓰지 마세요. 갤러리에는 반과 닉네임만 보입니다.</p>
+        <p class="err" id="login-err"></p>
+        <button class="btn btn-gold enter" type="submit">신진 화가로 입장하기</button>
+      </form>
+      <div class="teacher-link"><button class="btn btn-ghost btn-sm" data-go="gallery">입장하지 않고 갤러리 구경하기 →</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 2단계: 작업실 ================= -->
+<section id="screen-studio" class="screen" hidden>
+  <div class="wrap studio">
+    <aside class="panel lib">
+      <h2>조형 요소 <small>끌어다 놓거나 누르기</small></h2>
+      <div id="lib"></div>
+      <div class="lib-group">
+        <h3>색 · 삼원색 + 무채색</h3>
+        <div class="palette" id="palette"></div>
+        <p class="lib-note">고른 색은 새 도형과 선택한 도형에 함께 적용돼요.</p>
+      </div>
+    </aside>
+
+    <div class="stage">
+      <div class="stage-bar">
+        <button class="btn btn-sm" id="b-undo" title="되돌리기 (Ctrl+Z)">↶ 되돌리기</button>
+        <button class="btn btn-sm" id="b-redo" title="다시하기 (Ctrl+Y)">↷ 다시하기</button>
+        <button class="btn btn-sm" id="b-cog" aria-pressed="true">무게중심 보기</button>
+        <button class="btn btn-sm btn-danger" id="b-clear">전체 지우기</button>
+        <span class="spacer"></span>
+        <span class="editing-chip" id="editing-chip" hidden></span>
+      </div>
+      <div class="easel">
+        <div class="gold-frame">
+          <svg id="canvas" viewBox="0 0 600 600" role="img" aria-label="추상화 캔버스">
+            <defs><clipPath id="cv-clip"><rect width="600" height="600"/></clipPath></defs>
+            <rect width="600" height="600" fill="#f4efe2"/>
+            <g id="cv-shapes" clip-path="url(#cv-clip)"></g>
+            <g id="cv-cog" pointer-events="none"></g>
+            <g id="cv-sel"></g>
+          </svg>
+        </div>
+      </div>
+      <div class="sel-bar" id="sel-bar"></div>
+    </div>
+
+    <aside class="analysis">
+      <div class="panel">
+        <h2>조형 분석 엔진 <small>실시간</small></h2>
+        <div class="meter-box">
+          <div class="status" id="status"><div class="k">시각적 균형</div><div class="v">빈 캔버스</div><p>왼쪽에서 점·선·면을 골라 캔버스에 올려 보세요.</p></div>
+          <div class="seesaw">
+            <svg viewBox="0 0 280 92" aria-hidden="true">
+              <polygon points="140,58 124,88 156,88" fill="#3b3747"/>
+              <g id="beam" style="transform-origin:140px 56px;transition:transform .35s cubic-bezier(.3,1.4,.6,1)">
+                <rect x="20" y="52" width="240" height="7" rx="3" fill="#c9a24a"/>
+                <rect id="wl" x="34" y="30" width="34" height="22" rx="3" fill="#8d8d8d"/>
+                <rect id="wr" x="212" y="30" width="34" height="22" rx="3" fill="#8d8d8d"/>
+              </g>
+            </svg>
+            <div class="nums"><span id="n-left">왼쪽 0%</span><span id="n-right">오른쪽 0%</span></div>
+          </div>
+          <div class="bars" id="bars"></div>
+          <div><div class="k" style="font-size:12px;color:var(--muted);margin-bottom:6px">조형 원리 태그</div><div class="tags" id="live-tags"><span class="none">도형을 놓으면 태그가 생겨요</span></div></div>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:14px">
+        <h2>큐레이터 미션</h2>
+        <ul class="missions" id="missions"></ul>
+      </div>
+      <div style="margin-top:14px">
+        <button class="btn btn-gold submit-big" id="b-submit">전시실로 작품 보내기</button>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ================= 3단계: 학급 갤러리 ================= -->
+<section id="screen-gallery" class="screen" hidden>
+  <div class="wrap">
+    <div class="gal-head">
+      <div class="grow">
+        <h1>루브르 특별 전시실</h1>
+        <p id="gal-sub">신진 화가들의 추상화 도록</p>
+      </div>
+      <div class="row">
+        <select class="input" id="gal-sort" style="width:auto" aria-label="정렬">
+          <option value="new">최신순</option>
+          <option value="like">좋아요순</option>
+        </select>
+        <button class="btn" id="b-refresh">새로고침</button>
+      </div>
+    </div>
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div class="gal-grid" id="gal-grid"></div>
+  </div>
+</section>
+
+<!-- ================= 4단계: 교사 관리실 ================= -->
+<section id="screen-admin" class="screen" hidden>
+  <div class="wrap admin">
+    <div class="admin-top">
+      <h1>교사 관리실</h1>
+      <button class="btn" id="a-refresh">새로고침</button>
+      <button class="btn btn-ghost" id="a-logout">로그아웃</button>
+    </div>
+    <div class="admin-grid">
+      <div class="panel">
+        <h2>반별 제출 현황</h2>
+        <div class="count-bars" id="a-counts"></div>
+        <div class="legend"><span><i style="background:var(--gold)"></i>공개</span><span><i style="background:#5a5363"></i>비공개</span></div>
+      </div>
+      <div class="panel export">
+        <h2>수업 · 내보내기</h2>
+        <div class="row">
+          <label for="a-ex-cls" class="hint" style="margin:0">대상</label>
+          <select class="input" id="a-ex-cls" style="width:auto"></select>
+          <label class="hint" style="margin:0;display:flex;gap:6px;align-items:center"><input type="checkbox" id="a-ex-hidden"> 비공개 작품 포함</label>
+        </div>
+        <div class="row">
+          <button class="btn btn-gold" id="a-present">감상 수업 모드 (대형 화면)</button>
+        </div>
+        <div class="row">
+          <button class="btn" id="a-pdf">PDF 도록 받기</button>
+          <button class="btn" id="a-zip">작품 이미지 묶음(ZIP)</button>
+          <button class="btn" id="a-csv">수행평가 목록(CSV)</button>
+        </div>
+        <div class="progress" id="a-progress"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="row" style="margin-bottom:10px">
+        <h2 style="margin:0;margin-right:auto">작품 관리</h2>
+        <select class="input" id="a-filter" style="width:auto" aria-label="반 필터"></select>
+        <input class="input" id="a-search" style="width:200px" placeholder="닉네임·제목 검색">
+      </div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>작품</th><th>반</th><th>닉네임</th><th>제목</th><th>태그</th><th>♥</th><th>감상평</th><th>제출</th><th>관리</th></tr></thead>
+        <tbody id="a-rows"></tbody>
+      </table></div>
+    </div>
+  </div>
+</section>
+
+<div class="modal" id="modal" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+<div class="present" id="present" hidden></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* =====================================================================
+   설정: 구글 Apps Script 웹앱 주소를 API_URL에 붙여 넣으면
+   반 전체가 같은 갤러리를 씁니다. 비워 두면 '체험 모드'(이 브라우저에만 저장).
+   ===================================================================== */
+const CONFIG = {
+  API_URL: '',            // 예: 'https://script.google.com/macros/s/XXXX/exec'
+  GRADE: '2학년',          // 학년 표시
+  CLASSES: 6,             // 반 수 (1반 ~ N반)
+  DEMO_TEACHER_PIN: '1234'// 체험 모드 교사 비밀번호 (실제 비밀번호는 Apps Script 코드에서 설정)
+};
+
+/* ---------- 공통 도우미 ---------- */
+const CLASS_LIST = Array.from({length:CONFIG.CLASSES},(_,i)=>`${i+1}반`);
+const IS_DEMO = !CONFIG.API_URL;
+const $ = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+const esc = s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const r1 = n=>Math.round(n*10)/10;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const uid = ()=>Math.random().toString(36).slice(2,9);
+const store = {
+  get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},
+  del(k){try{localStorage.removeItem(k)}catch(e){}}
+};
+const sess = {
+  get(k){try{return sessionStorage.getItem(k)}catch(e){return null}},
+  set(k,v){try{sessionStorage.setItem(k,v)}catch(e){}},
+  del(k){try{sessionStorage.removeItem(k)}catch(e){}}
+};
+function toast(msg,ms=2600){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,ms)}
+function josa(word,a,b){const c=word.charCodeAt(word.length-1);if(c<0xac00||c>0xd7a3)return word+a+'('+b+')';return word+(((c-0xac00)%28)?a:b)}
+function fmtDate(t){const d=new Date(t);if(isNaN(d))return '';return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`}
+const ICON = {
+  heart:'<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.8 4.5c2.1 0 3.6 1.2 5.2 3 1.6-1.8 3.1-3 5.2-3 3.8 0 5.9 3.9 4.4 7.3C19.5 16.4 12 21 12 21z"/></svg>',
+  chat:'<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.8A8 8 0 1 1 21 12z"/></svg>'
+};
+const BAD_WORDS = ['씨발','시발','ㅅㅂ','병신','ㅂㅅ','개새','좆','존나','fuck','shit','sex','섹스','미친놈','닥쳐','꺼져','장애인','느금','애미','애비'];
+const hasBad = s=>{const t=String(s).toLowerCase().replace(/\s/g,'');return BAD_WORDS.some(w=>t.includes(w))};
+
+/* ---------- 색 · 조형 요소 정의 ---------- */
+const COLORS = {
+  red:   {hex:'#d22a2f',name:'빨강',w:1.45,primary:true, txt:'#fff'},
+  yellow:{hex:'#f1c21b',name:'노랑',w:0.85,primary:true, txt:'#222'},
+  blue:  {hex:'#1f4c9e',name:'파랑',w:1.3, primary:true, txt:'#fff'},
+  black: {hex:'#141414',name:'검정',w:1.6, txt:'#fff'},
+  gray:  {hex:'#8d8d8d',name:'회색',w:1.0, txt:'#fff'},
+  white: {hex:'#ffffff',name:'흰색',w:0.45,txt:'#333'}
+};
+const TYPE_INFO = {
+  dot:{name:'점',kind:'점'}, hline:{name:'직선',kind:'선'}, curve:{name:'곡선',kind:'선'}, arc:{name:'호선',kind:'선'},
+  zigzag:{name:'지그재그선',kind:'선'}, rect:{name:'사각형',kind:'면'}, circle:{name:'원',kind:'면'},
+  triangle:{name:'삼각형',kind:'면'}, semi:{name:'반원',kind:'면'}
+};
+const STROKE_TYPES = ['curve','arc','zigzag'];
+const LIB = [
+  {group:'점', items:[{type:'dot',name:'작은 점',w:26,h:26},{type:'dot',name:'큰 점',w:62,h:62}]},
+  {group:'선 · 몬드리안 & 칸딘스키', items:[
+    {type:'hline',name:'몬드리안 가로선',w:380,h:14},
+    {type:'hline',name:'몬드리안 세로선',w:380,h:14,rot:90},
+    {type:'curve',name:'칸딘스키 곡선',w:240,h:110,sw:9},
+    {type:'arc',name:'활 모양 곡선',w:210,h:90,sw:8},
+    {type:'zigzag',name:'지그재그선',w:240,h:70,sw:8}]},
+  {group:'면', items:[
+    {type:'rect',name:'정사각형',w:140,h:140},{type:'rect',name:'직사각형',w:230,h:110},
+    {type:'circle',name:'원',w:130,h:130},{type:'triangle',name:'삼각형',w:150,h:130},{type:'semi',name:'반원',w:170,h:85}]}
+];
+
+/* ---------- 도형 기하 ---------- */
+function strokePts(s){
+  const w=s.w,h=s.h,p=[];
+  if(s.type==='curve'){
+    const P=[[-w/2,0],[-w/6,-0.866*h],[w/6,0.866*h],[w/2,0]];
+    for(let i=0;i<=24;i++){const t=i/24,u=1-t,a=u*u*u,b=3*u*u*t,c=3*u*t*t,d=t*t*t;
+      p.push([a*P[0][0]+b*P[1][0]+c*P[2][0]+d*P[3][0],a*P[0][1]+b*P[1][1]+c*P[2][1]+d*P[3][1]])}
+  }else if(s.type==='arc'){
+    for(let i=0;i<=24;i++){const t=i/24,u=1-t;p.push([u*u*(-w/2)+t*t*(w/2),u*u*(h/2)+2*u*t*(-1.5*h)+t*t*(h/2)])}
+  }else if(s.type==='zigzag'){
+    for(let i=0;i<=6;i++)p.push([-w/2+i*w/6,i%2?-h/2:h/2]);
+  }
+  return p;
+}
+function strokeD(s){
+  const w=s.w,h=s.h;
+  if(s.type==='curve')return `M${r1(-w/2)} 0C${r1(-w/6)} ${r1(-0.866*h)} ${r1(w/6)} ${r1(0.866*h)} ${r1(w/2)} 0`;
+  if(s.type==='arc')return `M${r1(-w/2)} ${r1(h/2)}Q0 ${r1(-1.5*h)} ${r1(w/2)} ${r1(h/2)}`;
+  return 'M'+strokePts(s).map(q=>r1(q[0])+' '+r1(q[1])).join('L');
+}
+function polyLen(p){let L=0;for(let i=1;i<p.length;i++)L+=Math.hypot(p[i][0]-p[i-1][0],p[i][1]-p[i-1][1]);return L}
+function area(s){
+  const w=s.w,h=s.h;
+  switch(s.type){
+    case 'dot':return Math.PI*(w/2)*(w/2);
+    case 'hline':case 'rect':return w*h;
+    case 'circle':return Math.PI*w*h/4;
+    case 'triangle':return w*h/2;
+    case 'semi':return Math.PI*(w/2)*h/2;
+    default:return polyLen(strokePts(s))*(s.sw||8);
+  }
+}
+function localCentroid(s){
+  if(s.type==='triangle')return [0,s.h/6];
+  if(s.type==='semi')return [0,s.h/2-4*s.h/(3*Math.PI)];
+  if(STROKE_TYPES.includes(s.type)){const p=strokePts(s);let x=0,y=0;p.forEach(q=>{x+=q[0];y+=q[1]});return [x/p.length,y/p.length]}
+  return [0,0];
+}
+function worldCentroid(s){
+  const [lx,ly]=localCentroid(s),a=s.rot*Math.PI/180;
+  return [s.x+lx*Math.cos(a)-ly*Math.sin(a), s.y+lx*Math.sin(a)+ly*Math.cos(a)];
+}
+
+/* ---------- 도형 그리기 (SVG 문자열) ---------- */
+function shapeMarkup(s,hit){
+  const c=COLORS[s.color]||COLORS.black, hex=c.hex, w=s.w, h=s.h;
+  const ol = s.color==='white' ? ' stroke="#b3a88f" stroke-width="1.5"' : '';
+  let inner='';
+  switch(s.type){
+    case 'dot':inner=`<circle r="${r1(w/2)}" fill="${hex}"${ol}/>`;break;
+    case 'hline':case 'rect':inner=`<rect x="${r1(-w/2)}" y="${r1(-h/2)}" width="${r1(w)}" height="${r1(h)}" fill="${hex}"${ol}/>`;break;
+    case 'circle':inner=`<ellipse rx="${r1(w/2)}" ry="${r1(h/2)}" fill="${hex}"${ol}/>`;break;
+    case 'triangle':inner=`<polygon points="0,${r1(-h/2)} ${r1(w/2)},${r1(h/2)} ${r1(-w/2)},${r1(h/2)}" fill="${hex}"${ol}/>`;break;
+    case 'semi':inner=`<path d="M${r1(-w/2)} ${r1(h/2)}A${r1(w/2)} ${r1(h)} 0 0 1 ${r1(w/2)} ${r1(h/2)}Z" fill="${hex}"${ol}/>`;break;
+    default:{
+      const d=strokeD(s), sw=s.sw||8;
+      if(s.color==='white')inner+=`<path d="${d}" fill="none" stroke="#b3a88f" stroke-width="${sw+3}" stroke-linecap="round" stroke-linejoin="round"/>`;
+      inner+=`<path d="${d}" fill="none" stroke="${hex}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"/>`;
+      if(hit)inner+=`<path d="${d}" fill="none" stroke="transparent" stroke-width="${Math.max(sw,26)}" stroke-linecap="round" pointer-events="stroke"/>`;
+    }
+  }
+  if(hit&&(s.type==='hline'||(s.type==='rect'&&Math.min(w,h)<20)))inner+=`<rect x="${r1(-w/2)}" y="${r1(-Math.max(h,24)/2)}" width="${r1(w)}" height="${r1(Math.max(h,24))}" fill="transparent"/>`;
+  return `<g class="shape" data-id="${s.id}" transform="translate(${r1(s.x)} ${r1(s.y)}) rotate(${r1(s.rot)})">${inner}</g>`;
+}
+let _clip=0;
+function artSVG(shapes,attrs=''){
+  const id='ac'+(++_clip);
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" ${attrs}><defs><clipPath id="${id}"><rect width="600" height="600"/></clipPath></defs><rect width="600" height="600" fill="#f4efe2"/><g clip-path="url(#${id})">${shapes.map(s=>shapeMarkup(s,false)).join('')}</g></svg>`;
+}
+function cleanShape(o){
+  if(!o||!TYPE_INFO[o.type])return null;
+  const n=(v,a,b,d)=>{v=parseFloat(v);return isFinite(v)?clamp(v,a,b):d};
+  return {id:String(o.id||uid()).replace(/[^a-z0-9]/gi,'').slice(0,12)||uid(),type:o.type,
+    x:n(o.x,-300,900,300),y:n(o.y,-300,900,300),w:n(o.w,4,1400,100),h:n(o.h,2,1400,100),
+    rot:n(o.rot,-720,720,0),color:COLORS[o.color]?o.color:'black',sw:n(o.sw,2,60,8)};
+}
+
+/* ---------- 조형 분석 엔진 ---------- */
+function symmetry(shapes,ws){
+  let tot=0,m=0;
+  shapes.forEach((s,i)=>{
+    tot+=ws[i];
+    const a=((s.rot%180)+180)%180;
+    const selfSym = s.type==='dot'||s.type==='circle'||a<8||a>172||(Math.abs(a-90)<8&&s.type!=='triangle'&&s.type!=='semi');
+    if(Math.abs(s.x-300)<22&&selfSym){m+=ws[i];return}
+    const mx=600-s.x, A=area(s);
+    if(shapes.some((t,j)=>j!==i&&t.type===s.type&&t.color===s.color&&Math.abs(t.x-mx)<38&&Math.abs(t.y-s.y)<38&&Math.abs(area(t)/A-1)<0.4))m+=ws[i];
+  });
+  return tot?m/tot:0;
+}
+function isDiagonal(s){
+  if(s.type==='dot'||(s.type==='circle'))return false;
+  const a=((s.rot%90)+90)%90;return a>=15&&a<=75;
+}
+function analyze(shapes){
+  const out={n:shapes.length,cx:300,cy:300,dx:0,dy:0,left:0,right:0,key:'empty',sym:0,balance:0,move:0,rhythm:0,contrast:0,coverage:0,prim:0,tags:[],kinds:new Set(),dyn:0};
+  if(!shapes.length)return out;
+  let W=0,cx=0,cy=0,L=0,R=0,mv=0,mvW=0,curveW=0,cov=0;const ws=[],areas=[],typeCount={},primCount={};
+  shapes.forEach(s=>{
+    const A=area(s),w=A*(COLORS[s.color]?.w||1),[x,y]=worldCentroid(s);
+    ws.push(w);areas.push(A);W+=w;cx+=x*w;cy+=y*w;cov+=A;
+    if(x<299)L+=w;else if(x>301)R+=w;else{L+=w/2;R+=w/2}
+    out.kinds.add(TYPE_INFO[s.type].kind);
+    typeCount[s.type]=(typeCount[s.type]||0)+1;
+    if(COLORS[s.color]?.primary)primCount[s.color]=(primCount[s.color]||0)+1;
+    let fct=0;
+    if(s.type==='zigzag')fct=1;else if(s.type==='curve')fct=.85;else if(s.type==='arc')fct=.7;
+    if(s.type==='triangle')fct=Math.max(fct,.45);
+    if(isDiagonal(s))fct=Math.max(fct,1);
+    if(fct>=.7)out.dyn++;
+    const sq=Math.sqrt(A);mv+=sq*fct;mvW+=sq;
+    if(['curve','arc','semi','circle'].includes(s.type))curveW+=sq;
+  });
+  cx/=W;cy/=W;
+  Object.assign(out,{cx,cy,dx:(cx-300)/300,dy:(cy-300)/300,left:L/W,right:R/W});
+  out.sym=symmetry(shapes,ws);
+  const adx=Math.abs(out.dx);
+  out.key = adx<0.06 ? (out.sym>0.7||shapes.length<2?'sym':'asym') : adx<0.16 ? 'slight':'heavy';
+  out.balance=Math.round(clamp(100-adx*420,0,100));
+  out.move=Math.round(clamp(100*mv/mvW*1.15,0,100));
+  const maxSame=Math.max(...Object.values(typeCount));
+  out.rhythm=Math.round(clamp((maxSame-1)*22,0,100));
+  const sorted=[...areas].sort((a,b)=>a-b);
+  out.contrast=shapes.length<2?0:Math.round(clamp(Math.log2(sorted[sorted.length-1]/sorted[0])*15,0,100));
+  out.coverage=clamp(cov/360000,0,1);
+  out.prim=Object.keys(primCount).length;
+  const primShapes=Object.values(primCount).reduce((a,b)=>a+b,0);
+  const curveShare=curveW/mvW;
+  const t=[];
+  if(out.key==='sym')t.push('#대칭_균형');else if(out.key==='asym')t.push('#비대칭_균형');else if(out.key==='heavy')t.push('#불균형의_긴장감');
+  if(out.move>=50)t.push('#강렬한_동세');else if(curveShare>0.45&&shapes.length>=2)t.push('#부드러운_곡선_리듬');else if(out.move<12&&shapes.length>=3)t.push('#정적인_안정감');
+  if(out.prim===3)t.push('#삼원색_조화');else if(out.prim===0&&shapes.length>=2)t.push('#무채색_절제');else if(primShapes===1&&shapes.length>=4)t.push('#한_점_강조');
+  if(out.rhythm>=60)t.push('#반복과_리듬');
+  if(out.contrast>=70)t.push('#크기_대비');
+  if(out.coverage<0.2&&shapes.length>=2)t.push('#여백의_미');else if(out.coverage>0.85)t.push('#꽉_찬_화면');
+  out.tags=t.slice(0,5);
+  return out;
+}
+function describeShape(s){
+  const [x,y]=worldCentroid(s);
+  const hz=x<230?'왼쪽':x>370?'오른쪽':'가운데', vt=y<230?' 위':y>370?' 아래':'';
+  const a=area(s)/360000, size=a<0.02?'작은':a<0.08?'중간 크기':'큰';
+  return {pos:(hz==='가운데'&&vt)?vt.trim()+'쪽':hz+vt, size, name:`${COLORS[s.color].name} ${TYPE_INFO[s.type].name}`};
+}
+function statusText(a){
+  const side=a.dx<0?'왼쪽':'오른쪽', other=a.dx<0?'오른쪽':'왼쪽';
+  let v,p,cls;
+  switch(a.key){
+    case 'empty':return {cls:'',v:'빈 캔버스',p:'왼쪽에서 점·선·면을 골라 캔버스에 올려 보세요.'};
+    case 'sym':cls='good';v='대칭 균형';p='좌우가 거울처럼 닮아 안정적이에요. 한쪽을 살짝 바꿔 비대칭 균형에도 도전해 볼까요?';break;
+    case 'asym':cls='good';v='비대칭 균형';p='좌우 모양은 다르지만 시각적 무게가 맞아요. 큐레이터가 좋아하는 균형입니다!';break;
+    case 'slight':cls='warn';v=`${side}으로 조금 기울어짐`;p=`${other}에 작은 면이나 진한 점 하나를 더하면 균형이 맞아요.`;break;
+    default:cls='bad';v=`${side} 무게 과다 (불균형)`;p=`${other}에 작고 진한 색(빨강·검정)을 놓아 보세요. 진한 색은 작은 면적으로도 무게가 커서 비대칭 균형을 만들 수 있어요.`;
+  }
+  if(a.dy<-0.22)p+=' 위쪽이 무거워 쏟아질 듯한 긴장감이 있어요.';
+  return {cls,v,p};
+}
+function missionList(a){
+  return [
+    {t:'무게중심을 가운데 과녁 안에 넣기',ok:a.key==='sym'||a.key==='asym'},
+    {t:'모양이 다른 좌우로 비대칭 균형 만들기',ok:a.key==='asym'&&a.n>=3},
+    {t:'대각선·곡선·지그재그로 동세 3개 이상',ok:a.dyn>=3},
+    {t:'점·선·면 세 가지 요소 모두 쓰기',ok:a.kinds.size===3},
+    {t:'삼원색(빨강·노랑·파랑) 모두 쓰기',ok:a.prim===3}
+  ];
+}
+
+/* ---------- 상태 ---------- */
+const S = {
+  cls:'', nick:'', color:'red', shapes:[], sel:null, hist:[], fut:[], showCog:true,
+  editing:null, prevKey:'empty', holdMsg:null, lastTouched:null,
+  gCls:'', items:[], admin:sess.get('louvre_tpin'), liked:new Set(store.get('louvre_liked',[]))
+};
+
+/* =====================================================================
+   데이터 연결 (Apps Script 서버 또는 체험 모드)
+   ===================================================================== */
+const ERR = {wrong_pin:'비밀번호가 맞지 않아요.',not_found:'작품을 찾을 수 없어요. 새로고침해 보세요.',invalid:'입력 내용을 확인해 주세요.',no_pin:'비밀번호가 설정되지 않은 작품이에요.',busy:'서버가 바빠요. 잠시 후 다시 시도해 주세요.'};
+async function api(action,data={}){
+  if(IS_DEMO)return demoApi(action,JSON.parse(JSON.stringify(data)));
+  let res;
+  try{res=await fetch(CONFIG.API_URL,{method:'POST',body:JSON.stringify({action,...data})})}
+  catch(e){throw new Error('인터넷 연결 또는 서버 주소를 확인해 주세요.')}
+  let j;try{j=await res.json()}catch(e){throw new Error('서버 응답을 읽지 못했어요. Apps Script 배포 설정을 확인해 주세요.')}
+  if(!j.ok)throw new Error(ERR[j.error]||j.error||'오류가 났어요.');
+  return j;
+}
+/* 체험 모드: 브라우저 저장소에 같은 기능을 흉내 냄 */
+function demoDB(){
+  let db=store.get('louvre_demo_db',null);
+  if(!db){
+    const ex=(title,note,shapes,likes)=>({id:'ex'+uid(),createdAt:Date.now()-likes*3600e3,updatedAt:Date.now(),cls:'1반',nickname:'예시작가',title,note,pin:'',shapes,
+      tags:analyze(shapes).tags,likes,hidden:false,pinned:likes>6,comments:[{id:uid(),nickname:'큐레이터',text:'예시 작품이에요. 실제 수업에서는 지워 주세요.',at:Date.now()}]});
+    db=[
+      ex('(예시) 오른쪽의 작은 빨강','큰 검정 면을 작은 빨강이 받쳐요.',[
+        {id:'a1',type:'rect',x:200,y:340,w:250,h:250,rot:0,color:'black'},{id:'a2',type:'hline',x:300,y:150,w:600,h:14,rot:0,color:'black'},
+        {id:'a3',type:'circle',x:490,y:300,w:130,h:130,rot:0,color:'red'},{id:'a4',type:'rect',x:510,y:510,w:150,h:120,rot:0,color:'yellow'},
+        {id:'a5',type:'hline',x:400,y:300,w:600,h:12,rot:90,color:'black'}],8),
+      ex('(예시) 날아오르는 선','대각선과 곡선으로 움직임을 표현했어요.',[
+        {id:'b1',type:'curve',x:300,y:240,w:380,h:140,rot:-25,sw:12,color:'blue'},{id:'b2',type:'zigzag',x:300,y:430,w:320,h:70,rot:20,sw:9,color:'black'},
+        {id:'b3',type:'triangle',x:150,y:130,w:110,h:100,rot:35,color:'red'},{id:'b4',type:'dot',x:470,y:120,w:40,h:40,rot:0,color:'yellow'},
+        {id:'b5',type:'dot',x:430,y:520,w:26,h:26,rot:0,color:'black'}],5),
+      ex('(예시) 고요한 대칭','',[
+        {id:'c1',type:'circle',x:300,y:300,w:240,h:240,rot:0,color:'blue'},{id:'c2',type:'rect',x:150,y:470,w:90,h:90,rot:0,color:'gray'},
+        {id:'c3',type:'rect',x:450,y:470,w:90,h:90,rot:0,color:'gray'},{id:'c4',type:'dot',x:300,y:300,w:40,h:40,rot:0,color:'white'}],3)
+    ];
+    store.set('louvre_demo_db',db);
+  }
+  return db;
+}
+function pub(o){const {pin,...r}=o;return {...r,hasPin:!!pin}}
+function demoApi(a,d){
+  const db=demoDB(),save=()=>store.set('louvre_demo_db',db),find=id=>db.find(x=>x.id===id);
+  const T=()=>{if(d.tpin!==CONFIG.DEMO_TEACHER_PIN)throw new Error(ERR.wrong_pin)};
+  const it=d.id?find(d.id):null;
+  switch(a){
+    case 'list':return {ok:true,items:db.filter(x=>!x.hidden&&(!d.cls||x.cls===d.cls)).map(pub)};
+    case 'adminLogin':T();return {ok:true};
+    case 'adminList':T();return {ok:true,items:db.map(pub)};
+    case 'submit':{const o={id:'w'+Date.now().toString(36)+uid(),createdAt:Date.now(),updatedAt:Date.now(),cls:d.cls,nickname:d.nickname,title:d.title,note:d.note||'',pin:d.pin||'',shapes:d.shapes,tags:d.tags,likes:0,hidden:false,pinned:false,comments:[]};db.push(o);save();return {ok:true,item:pub(o)}}
+    case 'verify':if(!it)throw new Error(ERR.not_found);if(!it.pin)throw new Error(ERR.no_pin);if(it.pin!==d.pin)throw new Error(ERR.wrong_pin);return {ok:true};
+    case 'update':if(!it)throw new Error(ERR.not_found);if(!it.pin||it.pin!==d.pin)throw new Error(ERR.wrong_pin);Object.assign(it,{title:d.title,note:d.note,shapes:d.shapes,tags:d.tags,updatedAt:Date.now()});save();return {ok:true,item:pub(it)};
+    case 'deleteOwn':if(!it)throw new Error(ERR.not_found);if(!it.pin||it.pin!==d.pin)throw new Error(ERR.wrong_pin);db.splice(db.indexOf(it),1);save();return {ok:true};
+    case 'like':if(!it)throw new Error(ERR.not_found);it.likes=Math.max(0,it.likes+(d.delta<0?-1:1));save();return {ok:true,likes:it.likes};
+    case 'comment':if(!it)throw new Error(ERR.not_found);it.comments.push({id:uid(),nickname:d.nickname,text:d.text,at:Date.now()});it.comments=it.comments.slice(-50);save();return {ok:true,comments:it.comments};
+    case 'adminSet':T();if(!it)throw new Error(ERR.not_found);if('hidden' in d)it.hidden=!!d.hidden;if('pinned' in d)it.pinned=!!d.pinned;save();return {ok:true,item:pub(it)};
+    case 'adminDelete':T();if(it){db.splice(db.indexOf(it),1);save()}return {ok:true};
+    case 'adminDeleteComment':T();if(!it)throw new Error(ERR.not_found);it.comments=it.comments.filter(c=>c.id!==d.cid);save();return {ok:true,comments:it.comments};
+  }
+  throw new Error('알 수 없는 요청');
+}
+function normalize(it){
+  let shapes=it.shapes;if(typeof shapes==='string'){try{shapes=JSON.parse(shapes)}catch(e){shapes=[]}}
+  let tags=it.tags;if(typeof tags==='string'){try{tags=JSON.parse(tags)}catch(e){tags=[]}}
+  let comments=it.comments;if(typeof comments==='string'){try{comments=JSON.parse(comments)}catch(e){comments=[]}}
+  return {id:String(it.id),cls:String(it.cls||''),nickname:String(it.nickname||''),title:String(it.title||''),note:String(it.note||''),
+    shapes:(Array.isArray(shapes)?shapes:[]).map(cleanShape).filter(Boolean),
+    tags:(Array.isArray(tags)?tags:[]).map(String).filter(t=>/^#[\w가-힣_]{1,20}$/.test(t)).slice(0,6),
+    likes:+it.likes||0,hidden:it.hidden===true||it.hidden==='TRUE'||it.hidden==='true',pinned:it.pinned===true||it.pinned==='TRUE'||it.pinned==='true',
+    comments:(Array.isArray(comments)?comments:[]).map(c=>({id:String(c.id||''),nickname:String(c.nickname||''),text:String(c.text||''),at:c.at})),
+    createdAt:typeof it.createdAt==='number'?it.createdAt:Date.parse(it.createdAt)||0,hasPin:!!it.hasPin};
+}
+
+/* =====================================================================
+   화면 이동
+   ===================================================================== */
+function go(name){
+  if(name==='studio'&&!S.nick){name='intro';toast('먼저 반과 닉네임을 정해 주세요.')}
+  if(name==='admin'&&!S.admin){openTeacherLogin();return}
+  $$('.screen').forEach(s=>s.hidden=s.id!=='screen-'+name);
+  $$('.nav [data-go]').forEach(b=>b.setAttribute('aria-current',b.dataset.go===name?'page':'false'));
+  if(location.hash!=='#'+name)history.replaceState(null,'','#'+name);
+  if(name==='gallery')loadGallery();
+  if(name==='admin')loadAdmin();
+  if(name==='studio')renderAll();
+  window.scrollTo(0,0);
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b){e.preventDefault();go(b.dataset.go)}});
+function updateWho(){
+  const w=$('#who');
+  if(S.nick){w.hidden=false;w.innerHTML=`${esc(CONFIG.GRADE)} ${esc(S.cls)} · <b>${esc(S.nick)}</b>`}else w.hidden=true;
+  $('#nav-admin').hidden=!S.admin;
+  $('#teacher-label').textContent=S.admin?'교사 로그인됨':'교사';
+}
+
+/* ---------- 1단계: 접속 ---------- */
+(function initLogin(){
+  const sel=$('#in-cls');
+  sel.innerHTML=CLASS_LIST.map(c=>`<option value="${c}">${esc(CONFIG.GRADE)} ${c}</option>`).join('');
+  const saved=store.get('louvre_me',null);
+  if(saved){sel.value=saved.cls;$('#in-nick').value=saved.nick}
+  $('#login-form').addEventListener('submit',e=>{
+    e.preventDefault();
+    const nick=$('#in-nick').value.trim().replace(/\s+/g,' ');
+    const err=$('#login-err');
+    if(nick.length<2){err.textContent='닉네임은 2글자 이상으로 지어 주세요.';return}
+    if(/^\d+$/.test(nick)||/\d{4,}/.test(nick)){err.textContent='번호처럼 보이는 닉네임은 쓸 수 없어요.';return}
+    if(hasBad(nick)){err.textContent='전시실에 어울리는 닉네임으로 바꿔 주세요.';return}
+    err.textContent='';
+    S.cls=sel.value;S.nick=nick;store.set('louvre_me',{cls:S.cls,nick:S.nick});
+    S.gCls=S.cls;updateWho();go('studio');
+  });
+})();
+
+/* =====================================================================
+   2단계: 작업실
+   ===================================================================== */
+const svg=$('#canvas'), gShapes=$('#cv-shapes'), gSel=$('#cv-sel'), gCog=$('#cv-cog');
+function iconSVG(item,color){
+  const k=item.type==='dot'?(item.w<40?4.5:3.6):440/Math.max(item.w,item.h);
+  const s={...item,x:300,y:300,rot:item.rot||0,color,sw:Math.max((item.sw||8)*k,28),w:item.w*k,h:item.type==='hline'?40:item.h*k};
+  return `<svg viewBox="0 0 600 600">${shapeMarkup(s,false)}</svg>`;
+}
+function renderLib(){
+  const iconColor=S.color==='white'?'white':S.color;
+  $('#lib').innerHTML=LIB.map((g,gi)=>`<div class="lib-group"><h3>${esc(g.group)}</h3><div class="lib-grid">${
+    g.items.map((it,ii)=>`<button class="tile" data-g="${gi}" data-i="${ii}" title="${esc(it.name)}" aria-label="${esc(it.name)} 추가">${iconSVG(it,iconColor)}<span class="tip">${esc(it.name)}</span></button>`).join('')}</div></div>`).join('');
+}
+function renderPalette(){
+  $('#palette').innerHTML=Object.entries(COLORS).map(([k,c])=>`<button class="sw" data-color="${k}" aria-pressed="${S.color===k}" style="background:${c.hex}" aria-label="${c.name}"><span style="color:${c.txt}">${c.name}</span></button>`).join('');
+}
+$('#palette').addEventListener('click',e=>{
+  const b=e.target.closest('[data-color]');if(!b)return;
+  S.color=b.dataset.color;renderPalette();renderLib();
+  const s=selShape();if(s&&s.color!==S.color){snap();s.color=S.color;commit()}
+});
+
+/* 도형 추가: 누르기 또는 끌어다 놓기 */
+let libDrag=null;
+$('#lib').addEventListener('pointerdown',e=>{
+  const t=e.target.closest('.tile');if(!t)return;
+  e.preventDefault();t.setPointerCapture(e.pointerId);
+  libDrag={t,item:LIB[t.dataset.g].items[t.dataset.i],x:e.clientX,y:e.clientY,moved:false,ghost:null};
+});
+$('#lib').addEventListener('pointermove',e=>{
+  if(!libDrag)return;
+  if(!libDrag.moved&&Math.hypot(e.clientX-libDrag.x,e.clientY-libDrag.y)>6){
+    libDrag.moved=true;const g=document.createElement('div');g.className='ghost';g.innerHTML=libDrag.t.querySelector('svg').outerHTML;document.body.appendChild(g);libDrag.ghost=g;
+  }
+  if(libDrag.ghost){libDrag.ghost.style.left=e.clientX+'px';libDrag.ghost.style.top=e.clientY+'px'}
+});
+function endLibDrag(e,cancel){
+  if(!libDrag)return;const d=libDrag;libDrag=null;if(d.ghost)d.ghost.remove();if(cancel)return;
+  if(!d.moved){addShape(d.item,300+(Math.random()*120-60),300+(Math.random()*120-60));return}
+  const r=svg.getBoundingClientRect();
+  if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom){const p=svgPt(e);addShape(d.item,p.x,p.y)}
+}
+$('#lib').addEventListener('pointerup',e=>endLibDrag(e,false));
+$('#lib').addEventListener('pointercancel',e=>endLibDrag(e,true));
+$('#lib').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.closest('.tile')){e.preventDefault();const t=e.target.closest('.tile');addShape(LIB[t.dataset.g].items[t.dataset.i],300,300)}});
+
+function addShape(item,x,y){
+  if(S.shapes.length>=120){toast('도형은 120개까지 놓을 수 있어요.');return}
+  snap();
+  const s={id:uid(),type:item.type,x,y,w:item.w,h:item.h,rot:item.rot||0,color:S.color,sw:item.sw||8};
+  S.shapes.push(s);S.sel=s.id;S.lastTouched=s.id;commit();
+}
+const selShape=()=>S.shapes.find(s=>s.id===S.sel);
+
+/* 되돌리기 */
+function snap(){S.hist.push(JSON.stringify(S.shapes));if(S.hist.length>60)S.hist.shift();S.fut=[]}
+function undo(){if(!S.hist.length)return;S.fut.push(JSON.stringify(S.shapes));S.shapes=JSON.parse(S.hist.pop());if(!selShape())S.sel=null;commit(true)}
+function redo(){if(!S.fut.length)return;S.hist.push(JSON.stringify(S.shapes));S.shapes=JSON.parse(S.fut.pop());if(!selShape())S.sel=null;commit(true)}
+$('#b-undo').onclick=undo;$('#b-redo').onclick=redo;
+$('#b-cog').onclick=()=>{S.showCog=!S.showCog;$('#b-cog').setAttribute('aria-pressed',S.showCog);renderCog(analyze(S.shapes))};
+$('#b-clear').onclick=function(){
+  if(!S.shapes.length)return;
+  if(this.dataset.armed){delete this.dataset.armed;this.textContent='전체 지우기';snap();S.shapes=[];S.sel=null;commit();toast('캔버스를 비웠어요. 되돌리기로 살릴 수 있어요.');return}
+  this.dataset.armed='1';this.textContent='한 번 더 누르면 지워요';
+  setTimeout(()=>{delete this.dataset.armed;this.textContent='전체 지우기'},3000);
+};
+
+/* 캔버스 렌더 */
+function svgPt(e){const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())}
+function renderShapes(){gShapes.innerHTML=S.shapes.map(s=>shapeMarkup(s,true)).join('')}
+function renderSel(){
+  const s=selShape();
+  if(!s){gSel.innerHTML='';renderSelBar();return}
+  const pad=6+(STROKE_TYPES.includes(s.type)?(s.sw||8)/2:0);
+  const hw=s.w/2+pad, hh=s.h/2+pad, k=600/Math.max(svg.getBoundingClientRect().width,200);
+  const hr=Math.max(9,11*k), sw=Math.max(1.5,1.6*k);
+  gSel.innerHTML=`<g transform="translate(${r1(s.x)} ${r1(s.y)}) rotate(${r1(s.rot)})">
+    <rect x="${r1(-hw)}" y="${r1(-hh)}" width="${r1(hw*2)}" height="${r1(hh*2)}" fill="none" stroke="#c9a24a" stroke-width="${sw}" stroke-dasharray="${6*k} ${4*k}" pointer-events="none"/>
+    <line x1="0" y1="${r1(-hh)}" x2="0" y2="${r1(-hh-34*k)}" stroke="#c9a24a" stroke-width="${sw}" pointer-events="none"/>
+    <circle class="h-rot" cx="0" cy="${r1(-hh-34*k)}" r="${r1(hr)}" fill="#fff" stroke="#7d5f1f" stroke-width="${sw}"/>
+    <path d="M${r1(-hr*.45)} ${r1(-hh-34*k)}a${r1(hr*.45)} ${r1(hr*.45)} 0 1 1 ${r1(hr*.45)} ${r1(hr*.45)}" fill="none" stroke="#7d5f1f" stroke-width="${sw}" pointer-events="none"/>
+    <rect class="h-resize" x="${r1(hw-hr)}" y="${r1(hh-hr)}" width="${r1(hr*2)}" height="${r1(hr*2)}" rx="3" fill="#ecd18a" stroke="#7d5f1f" stroke-width="${sw}"/>
+  </g>`;
+  renderSelBar();
+}
+function renderSelBar(){
+  const s=selShape(),bar=$('#sel-bar');
+  if(!s){bar.innerHTML=`<span class="sel-empty">도형을 누르면 색·회전·크기·순서를 바꿀 수 있어요. (Delete 삭제 · 방향키 이동 · Ctrl+Z 되돌리기)</span>`;return}
+  const sws=Object.entries(COLORS).map(([k,c])=>`<button class="mini-sw" data-sc="${k}" aria-pressed="${s.color===k}" style="background:${c.hex}" aria-label="${c.name}으로 바꾸기"></button>`).join('');
+  const thick=STROKE_TYPES.includes(s.type)?`<span class="sep"></span><button class="btn btn-sm" data-act="thin">선 가늘게</button><button class="btn btn-sm" data-act="thick">선 굵게</button>`:'';
+  bar.innerHTML=`${sws}<span class="sep"></span>
+    <button class="btn btn-sm" data-act="rotl" title="왼쪽으로 15° 회전">⟲ 15°</button>
+    <button class="btn btn-sm" data-act="rotr" title="오른쪽으로 15° 회전">⟳ 15°</button>
+    <button class="btn btn-sm" data-act="small">작게</button><button class="btn btn-sm" data-act="big">크게</button>${thick}
+    <span class="sep"></span>
+    <button class="btn btn-sm" data-act="front">맨 앞으로</button><button class="btn btn-sm" data-act="back">맨 뒤로</button>
+    <button class="btn btn-sm" data-act="dup">복제</button><button class="btn btn-sm btn-danger" data-act="del">삭제</button>`;
+}
+$('#sel-bar').addEventListener('click',e=>{
+  const s=selShape();if(!s)return;
+  const c=e.target.closest('[data-sc]');
+  if(c){snap();s.color=c.dataset.sc;S.color=s.color;renderPalette();renderLib();S.lastTouched=s.id;commit();return}
+  const b=e.target.closest('[data-act]');if(!b)return;
+  act(b.dataset.act);
+});
+function act(a){
+  const s=selShape();if(!s)return;snap();S.lastTouched=s.id;
+  const i=S.shapes.indexOf(s);
+  switch(a){
+    case 'rotl':s.rot=((s.rot-15)%360+360)%360;break;
+    case 'rotr':s.rot=(s.rot+15)%360;break;
+    case 'small':s.w=Math.max(8,s.w*0.88);s.h=Math.max(4,s.h*(s.type==='hline'?1:0.88));break;
+    case 'big':s.w=Math.min(1200,s.w*1.12);s.h=Math.min(1200,s.h*(s.type==='hline'?1:1.12));break;
+    case 'thin':s.sw=Math.max(2,s.sw-2);break;
+    case 'thick':s.sw=Math.min(40,s.sw+2);break;
+    case 'front':S.shapes.splice(i,1);S.shapes.push(s);break;
+    case 'back':S.shapes.splice(i,1);S.shapes.unshift(s);break;
+    case 'dup':{if(S.shapes.length>=120){toast('도형은 120개까지예요.');break}const n={...s,id:uid(),x:s.x+24,y:s.y+24};S.shapes.push(n);S.sel=n.id;S.lastTouched=n.id;break}
+    case 'del':S.shapes.splice(i,1);S.sel=null;S.lastTouched=null;break;
+  }
+  commit();
+}
+
+/* 끌기 · 크기 · 회전 */
+let drag=null;
+svg.addEventListener('pointerdown',e=>{
+  const p=svgPt(e),t=e.target;
+  if(t.closest('.h-resize')||t.closest('.h-rot')){
+    const s=selShape();if(!s)return;
+    drag={mode:t.closest('.h-resize')?'resize':'rot',s,snapped:false,uni:s.type==='dot'};
+  }else{
+    const g=t.closest('.shape');
+    if(g){const s=S.shapes.find(x=>x.id===g.dataset.id);S.sel=s.id;drag={mode:'move',s,ox:p.x-s.x,oy:p.y-s.y,snapped:false};renderSel()}
+    else{S.sel=null;renderSel();return}
+  }
+  svg.setPointerCapture(e.pointerId);e.preventDefault();
+});
+svg.addEventListener('pointermove',e=>{
+  if(!drag)return;const p=svgPt(e),s=drag.s;
+  if(!drag.snapped){snap();drag.snapped=true}
+  if(drag.mode==='move'){s.x=clamp(p.x-drag.ox,-100,700);s.y=clamp(p.y-drag.oy,-100,700)}
+  else if(drag.mode==='rot'){
+    let a=Math.atan2(p.y-s.y,p.x-s.x)*180/Math.PI+90;a=(a+360)%360;
+    const near=Math.round(a/15)*15;if(e.shiftKey||Math.abs(a-near)<4)a=near%360;s.rot=Math.round(a);
+  }else{
+    const r=-s.rot*Math.PI/180,dx=p.x-s.x,dy=p.y-s.y;
+    const lx=dx*Math.cos(r)-dy*Math.sin(r),ly=dx*Math.sin(r)+dy*Math.cos(r);
+    const pad=6+(STROKE_TYPES.includes(s.type)?(s.sw||8)/2:0);
+    if(drag.uni){const v=Math.max(8,(Math.abs(lx)+Math.abs(ly))-pad*2);s.w=s.h=v}
+    else{s.w=clamp(2*Math.abs(lx)-pad*2,8,1200);s.h=clamp(2*Math.abs(ly)-pad*2,s.type==='hline'?4:6,1200)}
+  }
+  S.lastTouched=s.id;
+  renderShapes();renderSel();liveAnalysis(false);
+});
+function endDrag(){if(!drag)return;const moved=drag.snapped;drag=null;if(moved)commit();}
+svg.addEventListener('pointerup',endDrag);svg.addEventListener('pointercancel',endDrag);
+
+document.addEventListener('keydown',e=>{
+  if($('#screen-studio').hidden||!$('#modal').hidden)return;
+  if(/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName))return;
+  const k=e.key,ctrl=e.ctrlKey||e.metaKey;
+  if(ctrl&&k.toLowerCase()==='z'){e.preventDefault();e.shiftKey?redo():undo();return}
+  if(ctrl&&k.toLowerCase()==='y'){e.preventDefault();redo();return}
+  const s=selShape();if(!s)return;
+  if(k==='Delete'||k==='Backspace'){e.preventDefault();act('del');return}
+  if(ctrl&&k.toLowerCase()==='d'){e.preventDefault();act('dup');return}
+  if(k==='r'||k==='R'){act(e.shiftKey?'rotl':'rotr');return}
+  const st=e.shiftKey?20:4,mv={ArrowLeft:[-st,0],ArrowRight:[st,0],ArrowUp:[0,-st],ArrowDown:[0,st]}[k];
+  if(mv){e.preventDefault();if(!e.repeat)snap();s.x+=mv[0];s.y+=mv[1];S.lastTouched=s.id;commit(true)}
+  if(k==='Escape'){S.sel=null;renderSel()}
+});
+
+/* 분석 표시 */
+function renderCog(a){
+  if(!S.showCog||!a.n){gCog.innerHTML=S.showCog?`<circle cx="300" cy="300" r="18" fill="none" stroke="#c9a24a" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="4 4"/>`:'';return}
+  const good=a.key==='sym'||a.key==='asym', col=good?'#2f9e5c':a.key==='slight'?'#c48a10':'#d22a2f';
+  const x=clamp(a.cx,8,592),y=clamp(a.cy,8,592);
+  gCog.innerHTML=`<line x1="300" y1="0" x2="300" y2="600" stroke="#c9a24a" stroke-opacity=".35" stroke-dasharray="5 6"/>
+    <circle cx="300" cy="300" r="18" fill="none" stroke="#c9a24a" stroke-opacity=".6" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <line x1="300" y1="300" x2="${r1(x)}" y2="${r1(y)}" stroke="${col}" stroke-width="2" stroke-opacity=".7"/>
+    <g transform="translate(${r1(x)} ${r1(y)})"><circle r="13" fill="#fff" fill-opacity=".85" stroke="${col}" stroke-width="3"/>
+    <line x1="-20" y1="0" x2="20" y2="0" stroke="${col}" stroke-width="2"/><line x1="0" y1="-20" x2="0" y2="20" stroke="${col}" stroke-width="2"/>
+    <text y="-22" text-anchor="middle" font-size="13" font-family="sans-serif" font-weight="700" fill="${col}" paint-order="stroke" stroke="#fff" stroke-width="3">무게중심</text></g>`;
+}
+function liveAnalysis(onCommit){
+  const a=analyze(S.shapes);renderCog(a);
+  let st=statusText(a);
+  const box=$('#status');
+  // 불균형 → 균형으로 바뀐 순간: 마지막으로 만진 도형이 균형을 맞췄다고 알려 줌
+  if(onCommit){
+    const nowGood=a.key==='sym'||a.key==='asym', wasBad=S.prevKey==='slight'||S.prevKey==='heavy';
+    const last=S.shapes.find(s=>s.id===S.lastTouched);
+    if(nowGood&&wasBad&&last){
+      const d=describeShape(last);
+      const kind=a.key==='asym'?'비대칭 균형':'대칭 균형';
+      S.holdMsg={until:Date.now()+7000,v:kind+' 완성!',p:`${d.pos}의 ${d.size} ${josa(d.name,'이','가')} 무게를 받쳐 ${kind}이 맞춰졌어요.`};
+      box.classList.remove('flash');void box.offsetWidth;box.classList.add('flash');
+    }
+    S.prevKey=a.key;
+  }
+  if(S.holdMsg&&Date.now()<S.holdMsg.until&&(a.key==='sym'||a.key==='asym'))st={cls:'good',v:S.holdMsg.v,p:S.holdMsg.p};
+  box.className='status '+st.cls+(box.classList.contains('flash')?' flash':'');
+  box.innerHTML=`<div class="k">시각적 균형 · 좌우 무게 차이 ${Math.round(Math.abs(a.left-a.right)*100)}%p</div><div class="v">${esc(st.v)}</div><p>${esc(st.p)}</p>`;
+  const tilt=a.n?clamp((a.right-a.left)*30,-16,16):0;
+  $('#beam').style.transform=`rotate(${tilt}deg)`;
+  const sc=v=>18+v*30;
+  const wl=$('#wl'),wr=$('#wr'),hl=a.n?sc(a.left):14,hr=a.n?sc(a.right):14;
+  wl.setAttribute('height',r1(hl));wl.setAttribute('y',r1(52-hl));wr.setAttribute('height',r1(hr));wr.setAttribute('y',r1(52-hr));
+  $('#n-left').textContent=`왼쪽 ${Math.round(a.left*100)}%`;$('#n-right').textContent=`오른쪽 ${Math.round(a.right*100)}%`;
+  $('#bars').innerHTML=[['균형',a.balance],['동세',a.move],['리듬',a.rhythm],['대비',a.contrast]].map(([k,v])=>`<div class="bar"><span>${k}</span><div class="track"><div class="fill" style="width:${a.n?v:0}%"></div></div><span class="n">${a.n?v:'-'}</span></div>`).join('');
+  $('#live-tags').innerHTML=a.tags.length?a.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join(''):'<span class="none">도형을 놓으면 태그가 생겨요</span>';
+  $('#missions').innerHTML=missionList(a).map(m=>`<li class="${m.ok?'done':''}"><span class="ck">${m.ok?'✓':''}</span><span>${esc(m.t)}</span></li>`).join('');
+  return a;
+}
+function commit(fromUndo){
+  renderShapes();renderSel();liveAnalysis(true);
+  store.set('louvre_draft',{shapes:S.shapes,editing:S.editing});
+  $('#b-undo').disabled=!S.hist.length;$('#b-redo').disabled=!S.fut.length;
+}
+function renderAll(){
+  renderLib();renderPalette();
+  const ed=$('#editing-chip');
+  if(S.editing){ed.hidden=false;ed.innerHTML=`수정 중: ${esc(S.editing.title)} <button class="btn btn-ghost btn-sm" id="b-cancel-edit">새 작품으로</button>`}
+  else ed.hidden=true;
+  S.prevKey=analyze(S.shapes).key;commit();
+}
+document.addEventListener('click',e=>{
+  if(e.target.id==='b-cancel-edit'){S.editing=null;snap();S.shapes=[];S.sel=null;renderAll();toast('새 캔버스를 열었어요.')}
+});
+window.addEventListener('resize',()=>{if(!$('#screen-studio').hidden)renderSel()});
+
+/* ---------- 제출 ---------- */
+$('#b-submit').onclick=()=>{
+  if(S.shapes.length<2){toast('도형을 두 개 이상 놓아야 전시할 수 있어요.');return}
+  const a=analyze(S.shapes),ed=S.editing;
+  openModal(`<button class="btn btn-ghost x" data-close aria-label="닫기">✕</button>
+    <h2>${ed?'수정한 작품 다시 전시하기':'전시실로 작품 보내기'}</h2>
+    <div class="submit-grid">
+      <div><div class="card-frame">${artSVG(S.shapes)}</div><div class="tags" style="margin-top:12px">${a.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div></div>
+      <form id="sub-form" autocomplete="off" style="display:grid;gap:10px;align-content:start">
+        <div class="field"><label>작가</label><div>${esc(CONFIG.GRADE)} ${esc(S.cls)} · <b>${esc(S.nick)}</b></div></div>
+        <div class="field"><label for="f-title">작품 제목 (필수)</label><input id="f-title" class="input" maxlength="24" required value="${esc(ed?.title||'')}" placeholder="예: 오른쪽의 작은 빨강"></div>
+        <div class="field"><label for="f-note">작가 노트 (선택) · 어떤 조형 원리를 썼나요?</label><textarea id="f-note" class="input" rows="3" maxlength="80" placeholder="예: 큰 검정 사각형의 무게를 작은 빨간 원으로 맞췄어요.">${esc(ed?.note||'')}</textarea></div>
+        ${ed?`<p class="hint">처음 정한 4자리 비밀번호로 수정합니다.</p>`:`<div class="field"><label for="f-pin">4자리 비밀번호 (선택) · 나중에 내 작품 수정·삭제용</label><input id="f-pin" class="input" inputmode="numeric" pattern="\\d{4}" maxlength="4" placeholder="숫자 4자리" style="max-width:160px"></div>`}
+        <p class="err" id="sub-err"></p>
+        <button class="btn btn-gold" type="submit" id="sub-btn">${ed?'수정본 전시하기':'우리 반 갤러리에 전시하기'}</button>
+      </form>
+    </div>`);
+  $('#f-title').focus();
+  $('#sub-form').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const title=$('#f-title').value.trim(),note=$('#f-note').value.trim(),pin=ed?ed.pin:($('#f-pin').value.trim());
+    const err=$('#sub-err');
+    if(!title){err.textContent='작품 제목을 적어 주세요.';return}
+    if(hasBad(title)||hasBad(note)){err.textContent='전시실에 어울리는 말로 바꿔 주세요.';return}
+    if(pin&&!/^\d{4}$/.test(pin)){err.textContent='비밀번호는 숫자 4자리로 적어 주세요.';return}
+    const btn=$('#sub-btn');btn.disabled=true;btn.textContent='전시실로 옮기는 중…';
+    const shapes=S.shapes.map(s=>({id:s.id,type:s.type,x:r1(s.x),y:r1(s.y),w:r1(s.w),h:r1(s.h),rot:r1(s.rot),color:s.color,sw:r1(s.sw||8)}));
+    try{
+      const res=ed?await api('update',{id:ed.id,pin:ed.pin,title,note,shapes,tags:a.tags})
+                  :await api('submit',{cls:S.cls,nickname:S.nick,title,note,pin,shapes,tags:a.tags});
+      const done=[...S.shapes];
+      S.editing=null;S.hist=[];S.fut=[];S.shapes=[];S.sel=null;store.del('louvre_draft');
+      showDone(done,title,res.item&&res.item.id);
+    }catch(ex){err.textContent=ex.message;btn.disabled=false;btn.textContent='다시 시도하기'}
+  });
+};
+function showDone(shapes,title,id){
+  openModal(`<button class="btn btn-ghost x" data-close aria-label="닫기">✕</button>
+    <div style="text-align:center;display:grid;gap:14px">
+      <div class="case-no" style="color:var(--gold-hi)">전시 완료</div>
+      <h2 style="margin:0">「${esc(title)}」이 루브르에 걸렸어요!</h2>
+      <div class="done-art"><div class="card-frame">${artSVG(shapes)}</div></div>
+      <div class="row" style="justify-content:center">
+        <button class="btn btn-gold" id="d-gal">우리 반 갤러리에서 보기</button>
+        <button class="btn" id="d-png">이미지로 저장</button>
+        <button class="btn" id="d-new">새 작품 그리기</button>
+      </div>
+    </div>`,'narrow');
+  $('#d-gal').onclick=()=>{closeModal();S.gCls=S.cls;go('gallery')};
+  $('#d-png').onclick=async()=>{const c=await artCanvas(shapes,1200);downloadBlob(await canvasBlob(c,'image/png'),safeName(`${S.cls}_${S.nick}_${title}`)+'.png')};
+  $('#d-new').onclick=()=>{closeModal();renderAll()};
+  renderAll();
+}
+
+/* =====================================================================
+   3단계: 학급 갤러리
+   ===================================================================== */
+let galTimer=null;
+async function loadGallery(quiet){
+  if(!S.gCls)S.gCls=S.cls||CLASS_LIST[0];
+  if(!quiet&&!S.items.length)$('#gal-grid').innerHTML='<div class="empty">전시실 조명을 켜는 중…</div>';
+  try{
+    const res=S.admin?await api('adminList',{tpin:S.admin}):await api('list',{});
+    S.items=res.items.map(normalize);renderGallery();
+  }catch(e){
+    if(S.admin&&/비밀번호/.test(e.message)){logoutTeacher();return loadGallery()}
+    if(!quiet)$('#gal-grid').innerHTML=`<div class="empty"><b>갤러리를 불러오지 못했어요</b>${esc(e.message)}</div>`;
+  }
+  clearInterval(galTimer);
+  galTimer=setInterval(()=>{if(!$('#screen-gallery').hidden&&$('#modal').hidden)loadGallery(true)},25000);
+}
+function sortItems(list,mode){
+  return [...list].sort((a,b)=>(b.pinned-a.pinned)||(mode==='like'?(b.likes-a.likes):0)||(b.createdAt-a.createdAt));
+}
+function renderGallery(){
+  const counts={};S.items.forEach(i=>counts[i.cls]=(counts[i.cls]||0)+1);
+  $('#tabs').innerHTML=[...CLASS_LIST,'전체'].map(c=>`<button class="tab" role="tab" data-cls="${c}" aria-selected="${S.gCls===c}">${c==='전체'?'전체 전시실':esc(c)+' 갤러리'}<span class="c">${c==='전체'?S.items.length:(counts[c]||0)}</span></button>`).join('');
+  const list=sortItems(S.items.filter(i=>S.gCls==='전체'||i.cls===S.gCls),$('#gal-sort').value);
+  $('#gal-sub').textContent=`${CONFIG.GRADE} ${S.gCls==='전체'?'전체':S.gCls} · 작품 ${list.length}점`+(S.admin?' · 교사 모드(비공개 작품도 보임)':'');
+  $('#gal-grid').innerHTML=list.length?list.map(cardHTML).join(''):
+    `<div class="empty"><b>아직 걸린 작품이 없어요</b>${S.nick?'작업실에서 첫 작품을 완성해 전시실을 채워 주세요.':'작업실에 입장해 첫 작품을 걸어 보세요.'}</div>`;
+}
+function cardHTML(it){
+  return `<button class="card${it.hidden?' is-hidden':''}" data-id="${esc(it.id)}" aria-label="${esc(it.title)} 자세히 보기">
+    ${it.pinned?'<span class="ribbon">큐레이터 추천</span>':''}
+    <div class="card-frame">${artSVG(it.shapes)}</div>
+    <div class="plaque"><h3>${esc(it.title)}</h3><div class="artist">${esc(it.nickname)} · ${esc(it.cls)}</div>
+      <div class="tags">${it.tags.slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
+      <div class="foot"><span style="color:${S.liked.has(it.id)?'#c0362c':'inherit'}">${ICON.heart}${it.likes}</span><span>${ICON.chat}${it.comments.length}</span></div>
+    </div></button>`;
+}
+$('#tabs').addEventListener('click',e=>{const t=e.target.closest('[data-cls]');if(t){S.gCls=t.dataset.cls;renderGallery()}});
+$('#gal-sort').onchange=renderGallery;
+$('#b-refresh').onclick=()=>loadGallery();
+$('#gal-grid').addEventListener('click',e=>{const c=e.target.closest('.card');if(c)openDetail(c.dataset.id)});
+
+function openDetail(id){
+  const it=S.items.find(x=>x.id===id);if(!it)return;
+  const a=analyze(it.shapes);
+  openModal(`<button class="btn btn-ghost x" data-close aria-label="닫기">✕</button>
+    <div class="detail">
+      <div class="card-frame">${artSVG(it.shapes)}</div>
+      <div class="detail-info">
+        <div>${it.pinned?'<span class="pill pin">큐레이터 추천</span> ':''}${it.hidden?'<span class="pill off">비공개</span>':''}</div>
+        <h2>${esc(it.title)}</h2>
+        <div class="artist">${esc(it.nickname)} · ${esc(CONFIG.GRADE)} ${esc(it.cls)} · 요소 ${it.shapes.length}개</div>
+        ${it.note?`<p class="note">${esc(it.note)}</p>`:''}
+        <div class="tags">${it.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
+        <div class="mini-stats">${[['균형',a.balance],['동세',a.move],['리듬',a.rhythm],['대비',a.contrast]].map(([k,v])=>`<div><b>${v}</b><span>${k}</span></div>`).join('')}</div>
+        <div class="row"><button class="btn like${S.liked.has(it.id)?' on':''}" id="dt-like">${ICON.heart}<span>좋아요 ${it.likes}</span></button></div>
+        <div class="box"><h3>한 줄 감상평 ${it.comments.length}</h3>
+          <div class="comments" id="dt-cmts"></div>
+          ${S.nick?`<form class="cmt-form" id="dt-cform" autocomplete="off" style="margin-top:8px"><input class="input" id="dt-ctext" maxlength="40" placeholder="${esc(S.nick)}(으)로 감상평 남기기 (40자)"><button class="btn" type="submit">남기기</button></form>`
+          :`<p class="hint">작업실에 입장(반·닉네임)하면 감상평을 남길 수 있어요.</p>`}
+        </div>
+        <div id="dt-owner"></div>
+        ${S.admin?`<div class="box"><h3>교사 관리</h3><div class="row">
+          <button class="btn btn-sm" data-adm="pin">${it.pinned?'추천 해제':'우수작 핀 고정'}</button>
+          <button class="btn btn-sm" data-adm="hide">${it.hidden?'다시 공개':'비공개로 숨기기'}</button>
+          <button class="btn btn-sm btn-danger" data-adm="del">삭제</button></div></div>`:''}
+      </div>
+    </div>`);
+  const renderCmts=()=>{
+    $('#dt-cmts').innerHTML=it.comments.length?it.comments.map(c=>`<div class="cmt"><b>${esc(c.nickname)}</b><p>${esc(c.text)}</p>${S.admin?`<button class="btn btn-ghost btn-sm" data-dc="${esc(c.id)}" aria-label="감상평 삭제">✕</button>`:''}</div>`).join(''):'<p class="hint" style="margin:0">첫 감상평을 남겨 주세요.</p>';
+  };
+  renderCmts();
+  $('#dt-like').onclick=async()=>{
+    const on=S.liked.has(it.id);
+    try{const r=await api('like',{id:it.id,delta:on?-1:1});it.likes=r.likes;on?S.liked.delete(it.id):S.liked.add(it.id);store.set('louvre_liked',[...S.liked]);
+      $('#dt-like').classList.toggle('on',!on);$('#dt-like span').textContent='좋아요 '+it.likes;renderGallery()}catch(e){toast(e.message)}
+  };
+  const cf=$('#dt-cform');
+  if(cf)cf.onsubmit=async e=>{
+    e.preventDefault();const text=$('#dt-ctext').value.trim();if(!text)return;
+    if(hasBad(text)){toast('친구가 기분 좋게 읽을 수 있는 말로 바꿔 주세요.');return}
+    try{const r=await api('comment',{id:it.id,nickname:S.nick,text});it.comments=normalize({...it,comments:r.comments}).comments;$('#dt-ctext').value='';renderCmts();renderGallery()}catch(e){toast(e.message)}
+  };
+  $('#dt-cmts').addEventListener('click',async e=>{
+    const b=e.target.closest('[data-dc]');if(!b)return;
+    try{const r=await api('adminDeleteComment',{tpin:S.admin,id:it.id,cid:b.dataset.dc});it.comments=normalize({...it,comments:r.comments}).comments;renderCmts();renderGallery()}catch(e){toast(e.message)}
+  });
+  // 본인 작품 수정·삭제
+  const own=$('#dt-owner');
+  own.innerHTML=`<button class="btn btn-ghost btn-sm" id="dt-own">내 작품 수정·삭제</button>`;
+  $('#dt-own').onclick=()=>{
+    if(!it.hasPin){own.innerHTML=`<p class="hint">비밀번호를 정하지 않은 작품은 선생님께 수정·삭제를 부탁해 주세요.</p>`;return}
+    own.innerHTML=`<div class="box"><h3>제출할 때 정한 4자리 비밀번호</h3><form class="row" id="own-f"><input class="input" id="own-pin" inputmode="numeric" maxlength="4" style="width:120px" placeholder="0000"><button class="btn" type="submit">확인</button></form><p class="err" id="own-err"></p></div>`;
+    $('#own-pin').focus();
+    $('#own-f').onsubmit=async e=>{
+      e.preventDefault();const pin=$('#own-pin').value.trim();
+      try{await api('verify',{id:it.id,pin});
+        own.innerHTML=`<div class="box"><h3>본인 확인 완료</h3><div class="row"><button class="btn btn-gold btn-sm" id="own-edit">작업실에서 수정하기</button><button class="btn btn-danger btn-sm" id="own-del">작품 삭제</button></div></div>`;
+        $('#own-edit').onclick=()=>{
+          if(!S.nick){S.cls=it.cls;S.nick=it.nickname;updateWho()}
+          S.editing={id:it.id,pin,title:it.title,note:it.note};S.shapes=it.shapes.map(s=>({...s}));S.hist=[];S.fut=[];S.sel=null;closeModal();go('studio');toast('작품을 작업실로 가져왔어요.');
+        };
+        $('#own-del').onclick=async function(){
+          if(!this.dataset.armed){this.dataset.armed=1;this.textContent='한 번 더 누르면 삭제';return}
+          try{await api('deleteOwn',{id:it.id,pin});S.items=S.items.filter(x=>x.id!==it.id);closeModal();renderGallery();toast('작품을 삭제했어요.')}catch(e){toast(e.message)}
+        };
+      }catch(ex){$('#own-err').textContent=ex.message}
+    };
+  };
+  $$('[data-adm]').forEach(b=>b.onclick=async function(){
+    const k=this.dataset.adm;
+    try{
+      if(k==='del'){if(!this.dataset.armed){this.dataset.armed=1;this.textContent='한 번 더 누르면 삭제';return}
+        await api('adminDelete',{tpin:S.admin,id:it.id});S.items=S.items.filter(x=>x.id!==it.id);closeModal();renderGallery();toast('삭제했어요.');return}
+      const patch=k==='pin'?{pinned:!it.pinned}:{hidden:!it.hidden};
+      await api('adminSet',{tpin:S.admin,id:it.id,...patch});Object.assign(it,patch);renderGallery();openDetail(it.id);
+    }catch(e){toast(e.message)}
+  });
+}
+
+/* ---------- 모달 ---------- */
+function openModal(html,size=''){const m=$('#modal'),s=$('#sheet');s.className='sheet '+size;s.innerHTML=html;m.hidden=false;document.body.style.overflow='hidden'}
+function closeModal(){$('#modal').hidden=true;$('#sheet').innerHTML='';document.body.style.overflow=''}
+$('#modal').addEventListener('click',e=>{if(e.target.id==='modal'||e.target.closest('[data-close]'))closeModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#modal').hidden)closeModal()});
+
+/* =====================================================================
+   4단계: 교사 관리실
+   ===================================================================== */
+$('#btn-teacher').onclick=()=>S.admin?go('admin'):openTeacherLogin();
+function openTeacherLogin(){
+  openModal(`<button class="btn btn-ghost x" data-close aria-label="닫기">✕</button>
+    <h2>교사 전용 관리실</h2>
+    <form id="t-form" autocomplete="off" style="display:grid;gap:10px">
+      <div class="field"><label for="t-pin">교사 비밀번호</label><input id="t-pin" type="password" class="input" inputmode="numeric" maxlength="12"></div>
+      <p class="err" id="t-err"></p>
+      <button class="btn btn-gold" type="submit">입장</button>
+      ${IS_DEMO?'<p class="hint">체험 모드 비밀번호: 1234</p>':''}
+    </form>`,'narrow');
+  $('#t-pin').focus();
+  $('#t-form').onsubmit=async e=>{
+    e.preventDefault();const p=$('#t-pin').value.trim();
+    try{await api('adminLogin',{tpin:p});S.admin=p;sess.set('louvre_tpin',p);updateWho();closeModal();go('admin')}
+    catch(ex){$('#t-err').textContent=ex.message}
+  };
+}
+function logoutTeacher(){S.admin=null;sess.del('louvre_tpin');updateWho()}
+$('#a-logout').onclick=()=>{logoutTeacher();go('gallery');toast('교사 모드에서 나왔어요.')};
+$('#a-refresh').onclick=()=>loadAdmin();
+async function loadAdmin(){
+  $('#a-rows').innerHTML='<tr><td colspan="9">불러오는 중…</td></tr>';
+  try{const r=await api('adminList',{tpin:S.admin});S.items=r.items.map(normalize);renderAdmin()}
+  catch(e){if(/비밀번호/.test(e.message)){logoutTeacher();go('gallery');toast('다시 로그인해 주세요.')}else $('#a-rows').innerHTML=`<tr><td colspan="9">${esc(e.message)}</td></tr>`}
+}
+(function initAdminSelects(){
+  const opts=['전체',...CLASS_LIST].map(c=>`<option value="${c}">${c==='전체'?'전체 반':c}</option>`).join('');
+  $('#a-filter').innerHTML=opts;$('#a-ex-cls').innerHTML=opts;
+  $('#a-filter').onchange=renderAdmin;$('#a-search').oninput=renderAdmin;
+})();
+function renderAdmin(){
+  const max=Math.max(1,...CLASS_LIST.map(c=>S.items.filter(i=>i.cls===c).length));
+  $('#a-counts').innerHTML=CLASS_LIST.map(c=>{
+    const all=S.items.filter(i=>i.cls===c),hid=all.filter(i=>i.hidden).length,vis=all.length-hid;
+    return `<div class="cbar"><span>${esc(c)}</span><div class="track"><div class="vis" style="width:${vis/max*100}%"></div><div class="hid" style="width:${hid/max*100}%"></div></div><span class="n">${all.length}점${hid?` (${hid})`:''}</span></div>`;
+  }).join('');
+  const f=$('#a-filter').value,q=$('#a-search').value.trim().toLowerCase();
+  const list=sortItems(S.items.filter(i=>(f==='전체'||i.cls===f)&&(!q||(i.nickname+i.title).toLowerCase().includes(q))),'new');
+  $('#a-rows').innerHTML=list.length?list.map(it=>`<tr class="${it.hidden?'hid':''}" data-id="${esc(it.id)}">
+    <td class="thumb">${artSVG(it.shapes)}</td><td>${esc(it.cls)}</td><td>${esc(it.nickname)}</td>
+    <td>${esc(it.title)} ${it.pinned?'<span class="pill pin">추천</span>':''}${it.hidden?' <span class="pill off">비공개</span>':''}</td>
+    <td style="font-size:12px;color:var(--muted)">${esc(it.tags.join(' '))}</td><td>${it.likes}</td><td>${it.comments.length}</td>
+    <td style="font-size:12px;color:var(--muted);white-space:nowrap">${fmtDate(it.createdAt)}</td>
+    <td class="act"><button class="btn btn-sm" data-a="view">보기</button> <button class="btn btn-sm" data-a="pin">${it.pinned?'핀 해제':'핀 고정'}</button> <button class="btn btn-sm" data-a="hide">${it.hidden?'공개':'숨기기'}</button> <button class="btn btn-sm btn-danger" data-a="del">삭제</button></td></tr>`).join('')
+    :'<tr><td colspan="9" style="color:var(--muted)">조건에 맞는 작품이 없어요.</td></tr>';
+}
+$('#a-rows').addEventListener('click',async e=>{
+  const b=e.target.closest('[data-a]');if(!b)return;
+  const id=b.closest('tr').dataset.id,it=S.items.find(x=>x.id===id);if(!it)return;
+  const a=b.dataset.a;
+  try{
+    if(a==='view'){openDetail(id);return}
+    if(a==='del'){if(!b.dataset.armed){b.dataset.armed=1;b.textContent='정말 삭제?';setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent='삭제'}},3000);return}
+      await api('adminDelete',{tpin:S.admin,id});S.items=S.items.filter(x=>x.id!==id);renderAdmin();toast('삭제했어요.');return}
+    const patch=a==='pin'?{pinned:!it.pinned}:{hidden:!it.hidden};
+    b.disabled=true;await api('adminSet',{tpin:S.admin,id,...patch});Object.assign(it,patch);renderAdmin();
+  }catch(ex){toast(ex.message);b.disabled=false}
+});
+// 관리 모달에서 바뀐 내용이 표에도 반영되도록
+const _rg=renderGallery;renderGallery=function(){_rg();if(!$('#screen-admin').hidden)renderAdmin()};
+
+/* ---------- 내보내기 ---------- */
+function exportList(){
+  const c=$('#a-ex-cls').value,withHidden=$('#a-ex-hidden').checked;
+  return sortItems(S.items.filter(i=>(c==='전체'||i.cls===c)&&(withHidden||!i.hidden)),'new').sort((a,b)=>a.cls.localeCompare(b.cls,'ko',{numeric:true}));
+}
+function loadScript(src){return new Promise((res,rej)=>{if(document.querySelector(`script[src="${src}"]`))return res();const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('내보내기 도구를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.'));document.head.appendChild(s)})}
+const safeName=s=>String(s).replace(/[\\/:*?"<>|]+/g,'_').slice(0,60);
+function downloadBlob(blob,name){const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}
+function canvasBlob(c,type,q){return new Promise(r=>c.toBlob(r,type,q))}
+function artCanvas(shapes,size){
+  return new Promise((res,rej)=>{
+    const img=new Image();
+    img.onload=()=>{const c=document.createElement('canvas');c.width=c.height=size;const x=c.getContext('2d');x.drawImage(img,0,0,size,size);res(c)};
+    img.onerror=()=>rej(new Error('그림을 이미지로 바꾸지 못했어요.'));
+    img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(artSVG(shapes,`width="${size}" height="${size}"`));
+  });
+}
+const prog=t=>$('#a-progress').textContent=t;
+$('#a-csv').onclick=()=>{
+  const list=exportList();if(!list.length){toast('내보낼 작품이 없어요.');return}
+  const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+  const rows=[['반','닉네임','작품 제목','작가 노트','조형 원리 태그','요소 수','균형','동세','리듬','대비','좋아요','감상평 수','감상평','제출 시각','공개','우수작']];
+  list.forEach(i=>{const a=analyze(i.shapes);rows.push([i.cls,i.nickname,i.title,i.note,i.tags.join(' '),i.shapes.length,a.balance,a.move,a.rhythm,a.contrast,i.likes,i.comments.length,i.comments.map(c=>c.nickname+': '+c.text).join(' / '),new Date(i.createdAt).toLocaleString('ko-KR'),i.hidden?'비공개':'공개',i.pinned?'O':''])});
+  downloadBlob(new Blob(['﻿'+rows.map(r=>r.map(q).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}),`루브르_신진화가전_${$('#a-ex-cls').value}_목록.csv`);
+};
+$('#a-zip').onclick=async()=>{
+  const list=exportList();if(!list.length){toast('내보낼 작품이 없어요.');return}
+  try{
+    prog('압축 도구 불러오는 중…');await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+    const zip=new JSZip();
+    for(let k=0;k<list.length;k++){const i=list[k];prog(`이미지 만드는 중 ${k+1}/${list.length}`);
+      const c=await artCanvas(i.shapes,1200);zip.folder(i.cls).file(safeName(`${i.nickname}_${i.title}`)+`_${k+1}.png`,await canvasBlob(c,'image/png'))}
+    prog('압축하는 중…');downloadBlob(await zip.generateAsync({type:'blob'}),`루브르_신진화가전_${$('#a-ex-cls').value}_작품이미지.zip`);prog(`완료: ${list.length}점`);
+  }catch(e){prog(e.message)}
+};
+function wrapText(ctx,text,x,y,maxW,lh){
+  let line='',yy=y;for(const ch of String(text)){const t=line+ch;if(ctx.measureText(t).width>maxW&&line){ctx.fillText(line,x,yy);line=ch;yy+=lh}else line=t}
+  if(line)ctx.fillText(line,x,yy);return yy+lh;
+}
+$('#a-pdf').onclick=async()=>{
+  const list=exportList();if(!list.length){toast('내보낼 작품이 없어요.');return}
+  try{
+    prog('PDF 도구 불러오는 중…');await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+    try{await Promise.all([document.fonts.load('800 60px "Nanum Myeongjo"'),document.fonts.load('400 30px "IBM Plex Sans KR"')])}catch(e){}
+    const {jsPDF}=window.jspdf,pdf=new jsPDF({unit:'mm',format:'a4'});
+    const W=1240,H=1754,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');
+    const serif='"Nanum Myeongjo", Batang, serif',sans='"IBM Plex Sans KR","Malgun Gothic",sans-serif';
+    const label=$('#a-ex-cls').value==='전체'?CONFIG.GRADE+' 전체':CONFIG.GRADE+' '+$('#a-ex-cls').value;
+    // 표지
+    x.fillStyle='#17161c';x.fillRect(0,0,W,H);
+    x.strokeStyle='#c9a24a';x.lineWidth=6;x.strokeRect(70,70,W-140,H-140);x.lineWidth=2;x.strokeRect(90,90,W-180,H-180);
+    x.fillStyle='#ecd18a';x.textAlign='center';x.font=`800 54px ${serif}`;x.fillText('L O U V R E',W/2,520);
+    x.font=`800 88px ${serif}`;x.fillStyle='#f4efe2';x.fillText('신진 화가展',W/2,660);
+    x.font=`400 34px ${sans}`;x.fillStyle='#a49e94';x.fillText('도난당한 추상화를 대신할 특별전 도록',W/2,740);
+    x.font=`700 44px ${sans}`;x.fillStyle='#ecd18a';x.fillText(label,W/2,1000);
+    x.font=`400 30px ${sans}`;x.fillStyle='#a49e94';x.fillText(`출품작 ${list.length}점 · ${new Date().toLocaleDateString('ko-KR')}`,W/2,1060);
+    pdf.addImage(cv.toDataURL('image/jpeg',0.9),'JPEG',0,0,210,297);
+    for(let k=0;k<list.length;k++){
+      const it=list[k];prog(`도록 만드는 중 ${k+1}/${list.length}`);
+      x.textAlign='left';x.fillStyle='#f6f2e8';x.fillRect(0,0,W,H);
+      x.fillStyle='#8a7a5c';x.font=`400 24px ${sans}`;x.fillText(`LOUVRE 신진 화가展 · ${CONFIG.GRADE} ${it.cls}`,110,120);
+      x.textAlign='right';x.fillText(`No. ${String(k+1).padStart(2,'0')}`,W-110,120);x.textAlign='left';
+      const fx=150,fy=180,fs=W-300;
+      const g=x.createLinearGradient(fx,fy,fx+fs,fy+fs);g.addColorStop(0,'#f3d88f');g.addColorStop(.3,'#b98c33');g.addColorStop(.5,'#efd184');g.addColorStop(.78,'#8d6722');g.addColorStop(1,'#d9b45f');
+      x.fillStyle=g;x.fillRect(fx,fy,fs,fs);x.strokeStyle='#6e5016';x.lineWidth=4;x.strokeRect(fx+2,fy+2,fs-4,fs-4);
+      const art=await artCanvas(it.shapes,fs-72);x.drawImage(art,fx+36,fy+36);
+      let y=fy+fs+110;
+      x.fillStyle='#231d14';x.font=`800 56px ${serif}`;y=wrapText(x,it.title,150,y,W-300,70);
+      x.fillStyle='#5c5242';x.font=`400 30px ${sans}`;x.fillText(`${it.nickname} · ${CONFIG.GRADE} ${it.cls}`,150,y);y+=60;
+      x.fillStyle='#7d5f1f';x.font=`700 28px ${sans}`;x.fillText(it.tags.join('   '),150,y);y+=60;
+      if(it.note){x.fillStyle='#3b3226';x.font=`700 30px ${serif}`;y=wrapText(x,'“'+it.note+'”',150,y,W-300,46)+10}
+      const a=analyze(it.shapes);x.fillStyle='#8a7a5c';x.font=`400 24px ${sans}`;
+      x.fillText(`균형 ${a.balance} · 동세 ${a.move} · 리듬 ${a.rhythm} · 대비 ${a.contrast}   |   좋아요 ${it.likes} · 감상평 ${it.comments.length}`,150,Math.min(y+20,H-90));
+      pdf.addPage();pdf.addImage(cv.toDataURL('image/jpeg',0.9),'JPEG',0,0,210,297);
+    }
+    prog('PDF 저장하는 중…');pdf.save(`루브르_신진화가전_${$('#a-ex-cls').value}_도록.pdf`);prog(`완료: 표지 + ${list.length}쪽`);
+  }catch(e){prog(e.message)}
+};
+
+/* ---------- 감상 수업 모드 (대형 화면) ---------- */
+let P={list:[],i:0};
+$('#a-present').onclick=()=>{
+  const list=exportList();if(!list.length){toast('보여 줄 작품이 없어요.');return}
+  P.list=sortItems(list,'like');P.i=0;$('#present').hidden=false;renderPresent();
+  try{document.documentElement.requestFullscreen?.().catch(()=>{})}catch(e){}
+};
+function renderPresent(){
+  const it=P.list[P.i],a=analyze(it.shapes),st=statusText(a);
+  $('#present').innerHTML=`<div class="card-frame">${artSVG(it.shapes)}</div>
+    <div class="present-info">
+      ${it.pinned?'<span class="pill pin" style="font-size:14px">큐레이터 추천</span>':''}
+      <h2>${esc(it.title)}</h2><div class="artist">${esc(it.nickname)} · ${esc(it.cls)}</div>
+      <div class="tags">${it.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
+      ${it.note?`<p class="note">${esc(it.note)}</p>`:''}
+      <div class="mini-stats" style="margin-top:22px">${[['균형',a.balance],['동세',a.move],['리듬',a.rhythm],['대비',a.contrast]].map(([k,v])=>`<div><b>${v}</b><span>${k}</span></div>`).join('')}</div>
+      <p class="hint" style="font-size:16px;margin-top:14px">분석 엔진: ${esc(st.v)}</p>
+    </div>
+    <div class="present-ctrl"><button class="btn" data-p="-1">◀ 이전</button><span class="pos">${P.i+1} / ${P.list.length}</span><button class="btn" data-p="1">다음 ▶</button><button class="btn btn-ghost" data-p="x">닫기 (Esc)</button></div>`;
+}
+$('#present').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(!b)return;if(b.dataset.p==='x')closePresent();else{P.i=(P.i+(+b.dataset.p)+P.list.length)%P.list.length;renderPresent()}});
+function closePresent(){$('#present').hidden=true;try{document.fullscreenElement&&document.exitFullscreen()}catch(e){}}
+document.addEventListener('keydown',e=>{
+  if($('#present').hidden)return;
+  if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();P.i=(P.i+1)%P.list.length;renderPresent()}
+  else if(e.key==='ArrowLeft'){P.i=(P.i-1+P.list.length)%P.list.length;renderPresent()}
+  else if(e.key==='Escape')closePresent();
+});
+
+/* =====================================================================
+   시작
+   ===================================================================== */
+(function boot(){
+  $('#demo-bar').hidden=!IS_DEMO;
+  const me=store.get('louvre_me',null);if(me){S.cls=me.cls;S.nick=me.nick;S.gCls=me.cls}
+  const d=store.get('louvre_draft',null);
+  if(d&&Array.isArray(d.shapes)){S.shapes=d.shapes.map(cleanShape).filter(Boolean);S.editing=d.editing||null}
+  updateWho();
+  const h=location.hash.slice(1);
+  go(['studio','gallery','admin'].includes(h)?h:(S.nick?'studio':'intro'));
+})();
+</script>
+</body>
+</html>
