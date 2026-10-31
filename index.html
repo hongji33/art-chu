@@ -55,8 +55,10 @@ h1,h2,h3{text-wrap:balance;margin:0}
   border-bottom:1px solid var(--line);margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:10px max(16px,env(safe-area-inset-left,0px))}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--wall)}
 .topbar .wrap{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.brand{display:flex;align-items:baseline;gap:10px;margin-right:auto;min-width:0}
-.brand b{font-family:var(--f-display);font-weight:800;font-size:19px;letter-spacing:.18em;color:var(--gold-hi)}
+.brand{display:grid;grid-template-columns:auto auto;column-gap:10px;align-items:baseline;margin-right:auto;min-width:0;text-decoration:none;color:inherit}
+.brand .app-id{grid-column:1/-1;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.28em;color:#a8873a;line-height:1;margin-bottom:3px}
+.brand b{font-family:var(--f-display);font-weight:800;font-size:19px;letter-spacing:.18em;color:var(--gold-hi);white-space:nowrap}
+.brand b em{font-style:normal;font-family:var(--f-mono);font-weight:500;font-size:13px;letter-spacing:.12em;color:var(--gold);margin-left:6px;vertical-align:2px}
 .brand span{color:var(--muted);font-size:13px}
 .nav{display:flex;gap:4px}
 .nav .btn{background:transparent;border-color:transparent}
@@ -71,7 +73,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .ticker span{padding:0 28px}
 @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .intro{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:44px;align-items:center;padding-block:44px 60px}
-.crime{position:relative;display:grid;place-items:center;padding:20px}
+.crime{position:relative;display:grid;place-items:center;padding:20px;overflow:hidden}
 .frame{position:relative;width:min(100%,460px);aspect-ratio:4/5;padding:26px;border-radius:4px;
   background:linear-gradient(135deg,#f3d88f,#b98c33 30%,#e9c977 50%,#8d6722 75%,#d9b45f);
   box-shadow:0 30px 60px rgba(0,0,0,.55),inset 0 0 0 3px #6e5016,inset 0 0 0 9px #e2c070,inset 0 0 0 12px #7a5a1b}
@@ -294,6 +296,15 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 .bg-opt span{display:block;font-size:12.5px;padding:5px 2px}
 .bg-opt[aria-pressed="true"],.bg-opt:hover{border-color:var(--gold-hi)}
 
+.tag-btn{cursor:pointer;font:inherit;font-size:12px;transition:background .15s,transform .1s}
+.tag-btn:hover{background:#3a2f15;border-color:var(--gold)}
+.tag-btn:active{transform:scale(.96)}
+.tag-tip{font-size:12px;color:var(--muted);margin:6px 0 0}
+.hl-on .shape{transition:opacity .25s}
+.hl-on .shape:not(.hl){opacity:.15}
+.shape.hl .sh-in{transform-box:fill-box;transform-origin:center;animation:wiggle .45s ease-in-out 4;filter:drop-shadow(0 0 7px rgba(236,209,138,.95))}
+@keyframes wiggle{0%,100%{transform:rotate(0) scale(1)}25%{transform:rotate(-4deg) scale(1.07)}75%{transform:rotate(4deg) scale(1.07)}}
+
 /* ---------- 추상화 배우기 ---------- */
 .learn{padding-bottom:60px}
 .lgrid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
@@ -375,7 +386,8 @@ table.cmp{min-width:540px}
   .gold-frame{min-width:0}
   .form-row{grid-template-columns:1fr}
   .mission-strip{grid-template-columns:1fr}
-  .brand span{display:none}
+  .brand>span:last-child{display:none}
+  .nav .btn{padding:8px 9px}
 }
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
@@ -386,7 +398,7 @@ table.cmp{min-width:540px}
 
 <header class="topbar">
   <div class="wrap">
-    <div class="brand"><b>LOUVRE</b><span>특별전 · 신진 화가展</span></div>
+    <a class="brand" href="#intro" data-go="intro" aria-label="art-chu 첫 화면으로"><span class="app-id">art-chu</span><b>LOUVRE<em>2026</em></b><span>특별전 · 신진 화가展</span></a>
     <nav class="nav" aria-label="화면 이동">
       <button class="btn" data-go="learn" id="nav-learn">추상화 배우기</button>
       <button class="btn" data-go="studio" id="nav-studio">작업실</button>
@@ -829,7 +841,7 @@ function shapeMarkup(s,hit){
   }
   if(hit&&(s.type==='hline'||(s.type==='rect'&&Math.min(w,h)<20)))inner+=`<rect x="${r1(-w/2)}" y="${r1(-Math.max(h,24)/2)}" width="${r1(w)}" height="${r1(Math.max(h,24))}" fill="transparent"/>`;
   const op=s.op??1;
-  return `<g class="shape" data-id="${s.id}" transform="translate(${r1(s.x)} ${r1(s.y)}) rotate(${r1(s.rot)})"${op<1?` opacity="${Math.round(op*100)/100}"`:''}>${inner}</g>`;
+  return `<g class="shape" data-id="${s.id}" transform="translate(${r1(s.x)} ${r1(s.y)}) rotate(${r1(s.rot)})"${op<1?` opacity="${Math.round(op*100)/100}"`:''}><g class="sh-in">${inner}</g></g>`;
 }
 let _clip=0;
 function artSVG(shapes,attrs='',bg){
@@ -929,6 +941,55 @@ function statusText(a){
   if(a.dy<-0.22)p+=' 위쪽이 무거워 쏟아질 듯한 긴장감이 있어요.';
   return {cls,v,p};
 }
+/* 해시태그를 누르면 그림 속 해당 부분을 반짝이게 */
+function tagInfo(tag,shapes){
+  const W=s=>area(s)*colorInfo(s.color).w*(0.35+0.65*(s.op??1)),cx=s=>worldCentroid(s)[0];
+  const nm=s=>{const d=describeShape(s);return `${d.pos}의 ${d.size} ${d.name}`};
+  const dyn=s=>['zigzag','brush','curve','arc'].includes(s.type)||isDiagonal(s);
+  const top=(arr,f)=>[...arr].sort((a,b)=>f(b)-f(a));
+  const ids=a=>a.filter(Boolean).map(s=>s.id);
+  switch(tag){
+    case '#비대칭_균형':{const L=top(shapes.filter(s=>cx(s)<300),W)[0],R=top(shapes.filter(s=>cx(s)>=300),W)[0];
+      return {ids:ids([L,R]),msg:L&&R?`${josa(nm(L),'과','와')} ${josa(nm(R),'이','가')} 모양은 달라도 서로 무게를 맞추고 있어요.`:'좌우 무게가 맞아요.'}}
+    case '#대칭_균형':{const m=shapes.filter(s=>Math.abs(cx(s)-300)<22||shapes.some(t=>t!==s&&t.type===s.type&&Math.abs(cx(t)-(600-cx(s)))<38));
+      return {ids:ids(m),msg:'좌우가 거울처럼 닮은 부분이에요. 그래서 안정적으로 보여요.'}}
+    case '#불균형의_긴장감':{const lw=shapes.filter(s=>cx(s)<300).reduce((a,s)=>a+W(s),0),rw=shapes.filter(s=>cx(s)>=300).reduce((a,s)=>a+W(s),0),left=lw>rw;
+      return {ids:ids(shapes.filter(s=>left?cx(s)<300:cx(s)>=300)),msg:`${left?'왼쪽':'오른쪽'}에 무게가 몰려 있어 기울어질 듯한 긴장감이 생겨요.`}}
+    case '#뜨거운_추상':return {ids:ids(shapes.filter(s=>dyn(s)||s.type==='triangle')),msg:'자유로운 붓 자국과 곡선, 기울어진 모양이 감정을 드러내요.'};
+    case '#차가운_추상':return {ids:ids(shapes.filter(s=>!dyn(s))),msg:'곧은 선과 반듯한 도형이 질서 있는 느낌을 만들어요.'};
+    case '#강렬한_동세':return {ids:ids(shapes.filter(dyn)),msg:'사선·곡선·지그재그가 그림에 움직임을 만들어요.'};
+    case '#부드러운_곡선_리듬':return {ids:ids(shapes.filter(s=>['curve','arc','circle','semi','brush'].includes(s.type))),msg:'둥근 곡선들이 부드러운 흐름을 만들어요.'};
+    case '#정적인_안정감':return {ids:ids(shapes.filter(s=>!dyn(s))),msg:'수평·수직으로 반듯하게 놓인 모양들이 차분함을 줘요.'};
+    case '#삼원색_조화':return {ids:ids(shapes.filter(s=>colorInfo(s.color).primary)),msg:'빨강·노랑·파랑 삼원색이 함께 어울리고 있어요.'};
+    case '#무채색_절제':return {ids:ids(shapes),msg:'검정·흰색·회색만 써서 절제된 느낌을 줘요.'};
+    case '#한_점_강조':{const p=shapes.find(s=>colorInfo(s.color).primary);return {ids:ids([p]),msg:p?`${josa(nm(p),'이','가')} 혼자 색을 가지고 있어 눈길을 끌어요.`:''}}
+    case '#다채로운_색채':{const seen=new Set();return {ids:ids(shapes.filter(s=>{const c=String(s.color).toLowerCase();if(seen.has(c))return false;seen.add(c);return true})),msg:'여러 가지 색이 어울려 풍성한 느낌이에요.'}}
+    case '#반복과_리듬':{const cnt={};shapes.forEach(s=>cnt[s.type]=(cnt[s.type]||0)+1);const t=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a])[0];
+      return {ids:ids(shapes.filter(s=>s.type===t)),msg:`${josa(TYPE_INFO[t].name,'이','가')} ${cnt[t]}번 반복되며 리듬을 만들어요.`}}
+    case '#크기_대비':{const o=top(shapes,area),B=o[0],S2=o[o.length-1];return {ids:ids([B,S2]),msg:`가장 큰 ${josa(describeShape(B).name,'과','와')} 가장 작은 ${describeShape(S2).name}의 크기 차이가 서로를 돋보이게 해요.`}}
+    case '#여백의_미':return {ids:[],msg:'비어 있는 공간(여백)이 넓어서 그림이 숨 쉬는 느낌이에요. 빈 곳도 그림의 일부예요.'};
+    case '#꽉_찬_화면':return {ids:ids(shapes),msg:'모양들이 화면을 가득 채워 힘이 넘쳐요.'};
+  }
+  return {ids:[],msg:''};
+}
+function flashTag(svgEl,ids){
+  if(!svgEl)return;clearTimeout(svgEl._hlT);
+  const clear=()=>{svgEl.classList.remove('hl-on');svgEl.querySelectorAll('.shape.hl').forEach(g=>g.classList.remove('hl'))};
+  clear();void svgEl.getBoundingClientRect();svgEl.classList.add('hl-on');
+  ids.forEach(id=>svgEl.querySelectorAll(`.shape[data-id="${CSS.escape(String(id))}"]`).forEach(g=>g.classList.add('hl')));
+  svgEl._hlT=setTimeout(clear,2600);
+}
+const TAGCTX={};
+function tagBtns(tags,key,svgSel,shapes){
+  TAGCTX[key]={svgSel,shapes};
+  return tags.map(t=>`<button type="button" class="tag tag-btn" data-tk="${key}" data-tag="${esc(t)}" title="그림에서 찾아보기">${esc(t)}</button>`).join('');
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.tag-btn');if(!b)return;e.preventDefault();
+  const c=TAGCTX[b.dataset.tk];if(!c)return;
+  const info=tagInfo(b.dataset.tag,c.shapes);flashTag($(c.svgSel),info.ids);
+  if(info.msg)toast(b.dataset.tag+'  '+info.msg,4200);
+});
 function missionList(a){
   return [
     {t:'무게중심을 가운데 과녁 안에 넣기',ok:a.key==='sym'||a.key==='asym'},
@@ -1348,7 +1409,7 @@ function liveAnalysis(onCommit){
   $('#bars').innerHTML=[['균형',a.balance],['동세',a.move],['리듬',a.rhythm],['대비',a.contrast]].map(([k,v])=>`<div class="bar"><span>${k}</span><div class="track"><div class="fill" style="width:${a.n?v:0}%"></div></div><span class="n">${a.n?v:'-'}</span></div>`).join('');
   $('#temp-dot').hidden=!a.n;$('#temp-dot').style.left=(a.n?a.temp:50)+'%';
   $('#temp-val').textContent=!a.n?'-':a.temp>=55?`뜨거운 쪽 ${a.temp}`:a.temp<=15?`차가운 쪽 ${a.temp}`:`중간 ${a.temp}`;
-  $('#live-tags').innerHTML=a.tags.length?a.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join(''):'<span class="none">도형을 놓으면 태그가 생겨요</span>';
+  $('#live-tags').innerHTML=a.tags.length?tagBtns(a.tags,'studio','#canvas',S.shapes)+'<p class="tag-tip" style="width:100%">태그를 누르면 그림에서 그 부분이 반짝여요.</p>':'<span class="none">도형을 놓으면 태그가 생겨요</span>';
   $('#missions').innerHTML=missionList(a).map(m=>`<li class="${m.ok?'done':''}"><span class="ck">${m.ok?'✓':''}</span><span>${esc(m.t)}</span></li>`).join('');
   return a;
 }
@@ -1376,11 +1437,11 @@ $('#b-submit').onclick=()=>{
   openModal(`<button class="btn btn-ghost x" data-close aria-label="닫기">✕</button>
     <h2>${ed?'수정한 작품 다시 전시하기':'전시실로 작품 보내기'}</h2>
     <div class="submit-grid">
-      <div><div class="card-frame">${artSVG(S.shapes,'',S.bg)}</div><div class="tags" style="margin-top:12px">${a.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div></div>
+      <div><div class="card-frame" id="sub-art">${artSVG(S.shapes,'',S.bg)}</div><div class="tags" style="margin-top:12px">${tagBtns(a.tags,'sub','#sub-art svg',S.shapes)}</div><p class="tag-tip">태그를 누르면 그림에서 그 부분이 반짝여요.</p></div>
       <form id="sub-form" autocomplete="off" style="display:grid;gap:10px;align-content:start">
         <div class="field"><label>작가</label><div>${esc(CONFIG.GRADE)} ${esc(S.cls)} · <b>${esc(S.nick)}</b></div></div>
         <div class="field"><label for="f-title">작품 제목 (필수)</label><input id="f-title" class="input" maxlength="24" required value="${esc(ed?.title||'')}" placeholder="예: 오른쪽의 작은 빨강"></div>
-        <div class="field"><label for="f-note">작가 노트 (선택) · 어떤 조형 원리를 썼나요?</label><textarea id="f-note" class="input" rows="3" maxlength="80" placeholder="예: 큰 검정 사각형의 무게를 작은 빨간 원으로 맞췄어요.">${esc(ed?.note||'')}</textarea></div>
+        <div class="field"><label for="f-note">작가 노트 (선택) · 어떤 조형 원리를 썼나요?</label><p class="tag-tip" style="margin:0 0 6px">작품 아래의 해시태그를 참고해 보세요. 태그를 누르면 그 부분이 그림에서 반짝여요.</p><textarea id="f-note" class="input" rows="3" maxlength="80" placeholder="예: 큰 검정 사각형의 무게를 작은 빨간 원으로 맞췄어요.">${esc(ed?.note||'')}</textarea></div>
         ${ed?`<p class="hint">처음 정한 4자리 비밀번호로 수정합니다.</p>`:`<div class="field"><label for="f-pin">4자리 비밀번호 (선택) · 나중에 내 작품 수정·삭제용</label><input id="f-pin" class="input" inputmode="numeric" pattern="\\d{4}" maxlength="4" placeholder="숫자 4자리" style="max-width:160px"></div>`}
         <p class="err" id="sub-err"></p>
         <button class="btn btn-gold" type="submit" id="sub-btn">${ed?'수정본 전시하기':'우리 반 갤러리에 전시하기'}</button>
@@ -1471,13 +1532,13 @@ function openDetail(id){
   const a=analyze(it.shapes);
   openModal(`<button class="btn btn-ghost x" data-close aria-label="닫기">✕</button>
     <div class="detail">
-      <div class="card-frame">${artSVG(it.shapes,'',it.bg)}</div>
+      <div class="card-frame" id="dt-art">${artSVG(it.shapes,'',it.bg)}</div>
       <div class="detail-info">
         <div>${it.pinned?'<span class="pill pin">큐레이터 추천</span> ':''}${it.hidden?'<span class="pill off">비공개</span>':''}</div>
         <h2>${esc(it.title)}</h2>
         <div class="artist">${esc(it.nickname)} · ${esc(CONFIG.GRADE)} ${esc(it.cls)} · 요소 ${it.shapes.length}개</div>
         ${it.note?`<p class="note">${esc(it.note)}</p>`:''}
-        <div class="tags">${it.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
+        <div class="tags">${tagBtns(it.tags,'dt','#dt-art svg',it.shapes)}</div>
         <div class="mini-stats">${[['균형',a.balance],['동세',a.move],['리듬',a.rhythm],['대비',a.contrast]].map(([k,v])=>`<div><b>${v}</b><span>${k}</span></div>`).join('')}</div>
         <div class="row"><button class="btn like${S.liked.has(it.id)?' on':''}" id="dt-like">${ICON.heart}<span>좋아요 ${it.likes}</span></button></div>
         <div class="box"><h3>한 줄 감상평 ${it.comments.length}</h3>
@@ -1702,11 +1763,11 @@ $('#a-present').onclick=()=>{
 };
 function renderPresent(){
   const it=P.list[P.i],a=analyze(it.shapes),st=statusText(a);
-  $('#present').innerHTML=`<div class="card-frame">${artSVG(it.shapes,'',it.bg)}</div>
+  $('#present').innerHTML=`<div class="card-frame" id="pr-art">${artSVG(it.shapes,'',it.bg)}</div>
     <div class="present-info">
       ${it.pinned?'<span class="pill pin" style="font-size:14px">큐레이터 추천</span>':''}
       <h2>${esc(it.title)}</h2><div class="artist">${esc(it.nickname)} · ${esc(it.cls)}</div>
-      <div class="tags">${it.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
+      <div class="tags">${tagBtns(it.tags,'pr','#pr-art svg',it.shapes)}</div>
       ${it.note?`<p class="note">${esc(it.note)}</p>`:''}
       <div class="mini-stats" style="margin-top:22px">${[['균형',a.balance],['동세',a.move],['리듬',a.rhythm],['대비',a.contrast]].map(([k,v])=>`<div><b>${v}</b><span>${k}</span></div>`).join('')}</div>
       <p class="hint" style="font-size:16px;margin-top:14px">분석 엔진: ${esc(st.v)}</p>
