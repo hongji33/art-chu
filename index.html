@@ -156,6 +156,13 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .seesaw .nums{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:12px;color:var(--muted);margin-top:-4px}
 .bars{display:grid;gap:7px}
 .bar{display:grid;grid-template-columns:44px 1fr 32px;gap:8px;align-items:center;font-size:12.5px}
+.lvl{display:grid;grid-template-columns:40px 64px 1fr;gap:8px;align-items:center;font-size:13px}
+.lvl .k{color:var(--muted)}
+.lvl b{font-weight:700;color:var(--ink)}
+.dots{display:inline-flex;gap:4px}
+.dots i{width:10px;height:10px;border-radius:50%;background:#34303e;display:block}
+.dots i.on{background:var(--gold-hi);box-shadow:0 0 6px rgba(236,209,138,.45)}
+.lvl-note{font-size:11.5px;color:var(--muted);margin:4px 0 0;line-height:1.5}
 .bar .track{height:8px;background:#15141a;border-radius:99px;overflow:hidden}
 .bar .fill{height:100%;background:linear-gradient(90deg,var(--gold-deep),var(--gold-hi));border-radius:99px;transition:width .3s}
 .bar .n{font-family:var(--f-mono);color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
@@ -210,7 +217,10 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .note{font-family:var(--f-display);color:#e3dccd;border-left:2px solid var(--gold);padding-left:10px;margin:0}
 .mini-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .mini-stats div{background:#1a1920;border:1px solid var(--line);border-radius:8px;padding:6px;text-align:center}
-.mini-stats b{display:block;font-family:var(--f-mono);font-size:16px;color:var(--gold-hi)}
+.mini-stats b{display:block;font-size:14px;color:var(--gold-hi);margin-top:4px}
+.mini-stats .dots{display:flex;justify-content:center}
+.mini-stats div>span:first-child{display:block;margin-bottom:5px}
+.mini-stats small{display:block;font-family:var(--f-mono);font-size:10.5px;color:var(--dim)}
 .mini-stats span{font-size:11px;color:var(--muted)}
 .comments{display:grid;gap:6px;max-height:210px;overflow:auto;padding-right:4px}
 .cmt{background:#1a1920;border-radius:8px;padding:7px 10px;font-size:13.5px;display:flex;gap:8px;align-items:flex-start}
@@ -259,7 +269,8 @@ tr.hid td.act{opacity:1}
 .present-info .artist{font-size:clamp(16px,1.6vw,22px);color:var(--muted);margin:8px 0 18px}
 .present-info .tags .tag{font-size:clamp(14px,1.3vw,18px);padding:4px 14px}
 .present-info .note{font-size:clamp(15px,1.4vw,20px);margin-top:18px}
-.present-info .mini-stats b{font-size:22px}
+.present-info .mini-stats b{font-size:clamp(15px,1.4vw,20px)}
+.present-info .mini-stats .dots i{width:13px;height:13px}
 .present-ctrl{position:absolute;bottom:max(16px,env(safe-area-inset-bottom,0px));right:max(16px,env(safe-area-inset-right,0px));display:flex;gap:6px;align-items:center}
 .present-ctrl .pos{font-family:var(--f-mono);color:var(--muted);margin:0 8px}
 
@@ -894,7 +905,7 @@ function analyze(shapes){
   shapes.forEach(s=>{
     const A=area(s),op=s.op??1,w=A*colorInfo(s.color).w*(0.35+0.65*op),[x,y]=worldCentroid(s);
     ws.push(w);areas.push(A);W+=w;cx+=x*w;cy+=y*w;cov+=A;
-    if(x<299)L+=w;else if(x>301)R+=w;else{L+=w/2;R+=w/2}
+    if(x<300)L+=w*(300-x);else R+=w*(x-300);
     out.kinds.add(TYPE_INFO[s.type].kind);
     typeCount[s.type]=(typeCount[s.type]||0)+1;
     if(colorInfo(s.color).primary)primCount[s.color]=(primCount[s.color]||0)+1;
@@ -908,7 +919,7 @@ function analyze(shapes){
     let tf=({brush:1,zigzag:.9,curve:.8,arc:.7,circle:.3,semi:.35,triangle:.3})[s.type]||0;if(isDiagonal(s))tf=Math.max(tf,.6);tp+=sq*tf;
   });
   cx/=W;cy/=W;
-  Object.assign(out,{cx,cy,dx:(cx-300)/300,dy:(cy-300)/300,left:L/W,right:R/W});
+  Object.assign(out,{cx,cy,dx:(cx-300)/300,dy:(cy-300)/300,left:clamp(.5-(cx-300)/300,0,1),right:clamp(.5+(cx-300)/300,0,1)});
   out.sym=symmetry(shapes,ws);
   const adx=Math.abs(out.dx);
   out.key = adx<0.06 ? (out.sym>0.7||shapes.length<2?'sym':'asym') : adx<0.16 ? 'slight':'heavy';
@@ -954,6 +965,21 @@ function statusText(a){
   if(a.dy<-0.22)p+=' 위쪽이 무거워 쏟아질 듯한 긴장감이 있어요.';
   return {cls,v,p};
 }
+/* 분석 결과를 점수 대신 '세기' 말로 (높을수록 좋은 점수가 아님) */
+const LEVELS={
+  balance:[[85,4,'잘 맞음'],[60,3,'거의 맞음'],[35,2,'조금 기울어짐'],[-1,1,'많이 기울어짐']],
+  move:[[70,4,'역동적'],[40,3,'활발함'],[15,2,'살짝 움직임'],[-1,1,'차분함']],
+  rhythm:[[90,4,'리듬감 강함'],[60,3,'반복'],[20,2,'조금 반복'],[-1,1,'반복 없음']],
+  contrast:[[85,4,'아주 강함'],[60,3,'뚜렷함'],[30,2,'조금 차이'],[-1,1,'비슷한 크기']]
+};
+function level(key,v){for(const [min,d,w] of LEVELS[key])if(v>=min)return {d,w};return {d:1,w:''}}
+const dotsHTML=d=>`<span class="dots" aria-hidden="true">${[1,2,3,4].map(i=>`<i class="${i<=d?'on':''}"></i>`).join('')}</span>`;
+const STAT_KEYS=[['균형','balance'],['동세','move'],['리듬','rhythm'],['대비','contrast']];
+function miniStats(a){
+  return STAT_KEYS.map(([k,key])=>{const L=level(key,a[key]);return `<div><span>${k}</span>${dotsHTML(L.d)}<b>${L.w}</b>${S.admin?`<small>${a[key]}</small>`:''}</div>`}).join('');
+}
+const levelText=a=>STAT_KEYS.map(([k,key])=>`${k} ${level(key,a[key]).w}`).join(' · ');
+
 /* 해시태그를 누르면 그림 속 해당 부분을 반짝이게 */
 function tagInfo(tag,shapes){
   const W=s=>area(s)*colorInfo(s.color).w*(0.35+0.65*(s.op??1)),cx=s=>worldCentroid(s)[0];
@@ -1427,16 +1453,16 @@ function liveAnalysis(onCommit){
   }
   if(S.holdMsg&&Date.now()<S.holdMsg.until&&(a.key==='sym'||a.key==='asym'))st={cls:'good',v:S.holdMsg.v,p:S.holdMsg.p};
   box.className='status '+st.cls+(box.classList.contains('flash')?' flash':'');
-  box.innerHTML=`<div class="k">시각적 균형 · 좌우 무게 차이 ${Math.round(Math.abs(a.left-a.right)*100)}%p</div><div class="v">${esc(st.v)}</div><p>${esc(st.p)}</p>`;
+  box.innerHTML=`<div class="k">시각적 균형</div><div class="v">${esc(st.v)}</div><p>${esc(st.p)}</p>`;
   const tilt=a.n?clamp((a.right-a.left)*30,-16,16):0;
   $('#beam').style.transform=`rotate(${tilt}deg)`;
   const sc=v=>18+v*30;
   const wl=$('#wl'),wr=$('#wr'),hl=a.n?sc(a.left):14,hr=a.n?sc(a.right):14;
   wl.setAttribute('height',r1(hl));wl.setAttribute('y',r1(52-hl));wr.setAttribute('height',r1(hr));wr.setAttribute('y',r1(52-hr));
   $('#n-left').textContent=`왼쪽 ${Math.round(a.left*100)}%`;$('#n-right').textContent=`오른쪽 ${Math.round(a.right*100)}%`;
-  $('#bars').innerHTML=[['균형',a.balance],['동세',a.move],['리듬',a.rhythm],['대비',a.contrast]].map(([k,v])=>`<div class="bar"><span>${k}</span><div class="track"><div class="fill" style="width:${a.n?v:0}%"></div></div><span class="n">${a.n?v:'-'}</span></div>`).join('');
+  $('#bars').innerHTML=STAT_KEYS.map(([k,key])=>{const L=a.n?level(key,a[key]):{d:0,w:'-'};return `<div class="lvl"><span class="k">${k}</span>${dotsHTML(L.d)}<b>${L.w}</b></div>`}).join('')+'<p class="lvl-note">점수가 아니라 원리의 세기예요. 내가 원한 느낌과 맞는지 살펴보세요.</p>';
   $('#temp-dot').hidden=!a.n;$('#temp-dot').style.left=(a.n?a.temp:50)+'%';
-  $('#temp-val').textContent=!a.n?'-':a.temp>=55?`뜨거운 쪽 ${a.temp}`:a.temp<=15?`차가운 쪽 ${a.temp}`:`중간 ${a.temp}`;
+  $('#temp-val').textContent=!a.n?'-':a.temp>=55?'뜨거운 쪽':a.temp<=15?'차가운 쪽':'중간';
   $('#live-tags').innerHTML=a.tags.length?tagBtns(a.tags,'studio','#canvas',S.shapes)+'<p class="tag-tip" style="width:100%">태그를 누르면 그림에서 그 부분이 반짝여요.</p>':'<span class="none">도형을 놓으면 태그가 생겨요</span>';
   $('#missions').innerHTML=missionList(a).map(m=>`<li class="${m.ok?'done':''}"><span class="ck">${m.ok?'✓':''}</span><span>${esc(m.t)}</span></li>`).join('');
   return a;
@@ -1567,7 +1593,7 @@ function openDetail(id){
         <div class="artist">${esc(it.nickname)} · ${esc(CONFIG.GRADE)} ${esc(it.cls)} · 요소 ${it.shapes.length}개</div>
         ${it.note?`<p class="note">${esc(it.note)}</p>`:''}
         <div class="tags">${tagBtns(it.tags,'dt','#dt-art svg',it.shapes)}</div>
-        <div class="mini-stats">${[['균형',a.balance],['동세',a.move],['리듬',a.rhythm],['대비',a.contrast]].map(([k,v])=>`<div><b>${v}</b><span>${k}</span></div>`).join('')}</div>
+        <div class="mini-stats">${miniStats(a)}</div>
         <div class="row"><button class="btn like${S.liked.has(it.id)?' on':''}" id="dt-like">${ICON.heart}<span>좋아요 ${it.likes}</span></button></div>
         <div class="box"><h3>한 줄 감상평 <span id="dt-ccount">${it.comments.length}</span></h3>
           <div class="comments" id="dt-cmts"></div>
@@ -1791,7 +1817,7 @@ $('#a-pdf').onclick=async()=>{
       x.fillStyle='#7d5f1f';x.font=`700 28px ${sans}`;x.fillText(it.tags.join('   '),150,y);y+=60;
       if(it.note){x.fillStyle='#3b3226';x.font=`700 30px ${serif}`;y=wrapText(x,'“'+it.note+'”',150,y,W-300,46)+10}
       const a=analyze(it.shapes);x.fillStyle='#8a7a5c';x.font=`400 24px ${sans}`;
-      x.fillText(`균형 ${a.balance} · 동세 ${a.move} · 리듬 ${a.rhythm} · 대비 ${a.contrast}   |   좋아요 ${it.likes} · 감상평 ${it.comments.length}`,150,Math.min(y+20,H-90));
+      x.fillText(`${levelText(a)}   |   좋아요 ${it.likes} · 감상평 ${it.comments.length}`,150,Math.min(y+20,H-90));
       pdf.addPage();pdf.addImage(cv.toDataURL('image/jpeg',0.9),'JPEG',0,0,210,297);
     }
     prog('PDF 저장하는 중…');pdf.save(`루브르_신진화가전_${$('#a-ex-cls').value}_도록.pdf`);prog(`완료: 표지 + ${list.length}쪽`);
@@ -1813,7 +1839,7 @@ function renderPresent(){
       <h2>${esc(it.title)}</h2><div class="artist">${esc(it.nickname)} · ${esc(it.cls)}</div>
       <div class="tags">${tagBtns(it.tags,'pr','#pr-art svg',it.shapes)}</div>
       ${it.note?`<p class="note">${esc(it.note)}</p>`:''}
-      <div class="mini-stats" style="margin-top:22px">${[['균형',a.balance],['동세',a.move],['리듬',a.rhythm],['대비',a.contrast]].map(([k,v])=>`<div><b>${v}</b><span>${k}</span></div>`).join('')}</div>
+      <div class="mini-stats" style="margin-top:22px">${miniStats(a)}</div>
       <p class="hint" style="font-size:16px;margin-top:14px">분석 엔진: ${esc(st.v)}</p>
     </div>
     <div class="present-ctrl"><button class="btn" data-p="-1">◀ 이전</button><span class="pos">${P.i+1} / ${P.list.length}</span><button class="btn" data-p="1">다음 ▶</button><button class="btn btn-ghost" data-p="x">닫기 (Esc)</button></div>`;
