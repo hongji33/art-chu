@@ -310,6 +310,12 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 @keyframes formflash{0%,100%{box-shadow:0 0 0 0 rgba(236,209,138,0)}40%{box-shadow:0 0 0 6px rgba(236,209,138,.55)}}
 .login-title{font-family:var(--f-display);color:var(--gold-hi);font-size:16px;margin:0 0 8px}
 
+.cmt .mine-tag{font-size:10.5px;color:var(--gold-hi);border:1px solid #5d4b22;border-radius:999px;padding:0 6px;margin-left:4px;font-weight:400}
+.cmt-act{display:flex;gap:2px;flex:none}
+.cmt-act .btn{padding:2px 7px;font-size:12px}
+.cmt-edit{display:flex;gap:6px;flex:1;min-width:0}
+.cmt-edit .input{padding:5px 8px;font-size:13.5px}
+
 /* ---------- 추상화 배우기 ---------- */
 .learn{padding-bottom:60px}
 .lgrid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
@@ -1008,6 +1014,9 @@ function missionList(a){
 }
 
 /* ---------- 상태 ---------- */
+function deviceKey(){let k=store.get('louvre_ck',null);if(!k){k=Array.from(crypto.getRandomValues(new Uint8Array(12)),b=>b.toString(16).padStart(2,'0')).join('');store.set('louvre_ck',k)}return k}
+const myCmts=()=>new Set(store.get('louvre_mycmts',[]));
+const addMyCmt=id=>{const m=myCmts();m.add(id);store.set('louvre_mycmts',[...m].slice(-300))};
 const S = {
   cls:'', nick:'', color:'red', mode:'shape', brush:'smooth', brushSize:12, opacity:1, shapeColor:'red', brushColor:'#e8572a', bg:'#f4efe2', bgChosen:false, shapes:[], sel:null, hist:[], fut:[], showCog:true,
   editing:null, prevKey:'empty', holdMsg:null, lastTouched:null,
@@ -1017,7 +1026,7 @@ const S = {
 /* =====================================================================
    데이터 연결 (Apps Script 서버 또는 체험 모드)
    ===================================================================== */
-const ERR = {wrong_pin:'비밀번호가 맞지 않아요.',not_found:'작품을 찾을 수 없어요. 새로고침해 보세요.',invalid:'입력 내용을 확인해 주세요.',no_pin:'비밀번호가 설정되지 않은 작품이에요.',busy:'서버가 바빠요. 잠시 후 다시 시도해 주세요.'};
+const ERR = {wrong_pin:'비밀번호가 맞지 않아요.',not_found:'작품을 찾을 수 없어요. 새로고침해 보세요.',invalid:'입력 내용을 확인해 주세요.',no_pin:'비밀번호가 설정되지 않은 작품이에요.',not_mine:'이 기기에서 쓴 감상평만 고치거나 지울 수 있어요.',busy:'서버가 바빠요. 잠시 후 다시 시도해 주세요.'};
 async function api(action,data={}){
   if(IS_DEMO)return demoApi(action,JSON.parse(JSON.stringify(data)));
   let res;
@@ -1050,7 +1059,8 @@ function demoDB(){
   }
   return db;
 }
-function pub(o){const {pin,...r}=o;return {...r,hasPin:!!pin}}
+const stripK=cs=>(cs||[]).map(({k,...c})=>c);
+function pub(o){const {pin,...r}=o;return {...r,comments:stripK(r.comments),hasPin:!!pin}}
 function demoApi(a,d){
   const db=demoDB(),save=()=>store.set('louvre_demo_db',db),find=id=>db.find(x=>x.id===id);
   const T=()=>{if(d.tpin!==CONFIG.DEMO_TEACHER_PIN)throw new Error(ERR.wrong_pin)};
@@ -1064,10 +1074,12 @@ function demoApi(a,d){
     case 'update':if(!it)throw new Error(ERR.not_found);if(!it.pin||it.pin!==d.pin)throw new Error(ERR.wrong_pin);Object.assign(it,{title:d.title,note:d.note,shapes:d.shapes,tags:d.tags,updatedAt:Date.now()});save();return {ok:true,item:pub(it)};
     case 'deleteOwn':if(!it)throw new Error(ERR.not_found);if(!it.pin||it.pin!==d.pin)throw new Error(ERR.wrong_pin);db.splice(db.indexOf(it),1);save();return {ok:true};
     case 'like':if(!it)throw new Error(ERR.not_found);it.likes=Math.max(0,it.likes+(d.delta<0?-1:1));save();return {ok:true,likes:it.likes};
-    case 'comment':if(!it)throw new Error(ERR.not_found);it.comments.push({id:uid(),nickname:d.nickname,text:d.text,at:Date.now()});it.comments=it.comments.slice(-50);save();return {ok:true,comments:it.comments};
+    case 'comment':{if(!it)throw new Error(ERR.not_found);const cid=uid();it.comments.push({id:cid,nickname:d.nickname,text:d.text,at:Date.now(),k:d.ck||''});it.comments=it.comments.slice(-50);save();return {ok:true,cid,comments:stripK(it.comments)}}
+    case 'editComment':case 'deleteComment':{if(!it)throw new Error(ERR.not_found);const c=it.comments.find(x=>x.id===d.cid);if(!c)throw new Error(ERR.not_found);if(!c.k||c.k!==d.ck)throw new Error(ERR.not_mine);
+      if(a==='editComment'){c.text=d.text;c.edited=true}else it.comments=it.comments.filter(x=>x!==c);save();return {ok:true,comments:stripK(it.comments)}}
     case 'adminSet':T();if(!it)throw new Error(ERR.not_found);if('hidden' in d)it.hidden=!!d.hidden;if('pinned' in d)it.pinned=!!d.pinned;save();return {ok:true,item:pub(it)};
     case 'adminDelete':T();if(it){db.splice(db.indexOf(it),1);save()}return {ok:true};
-    case 'adminDeleteComment':T();if(!it)throw new Error(ERR.not_found);it.comments=it.comments.filter(c=>c.id!==d.cid);save();return {ok:true,comments:it.comments};
+    case 'adminDeleteComment':T();if(!it)throw new Error(ERR.not_found);it.comments=it.comments.filter(c=>c.id!==d.cid);save();return {ok:true,comments:stripK(it.comments)};
   }
   throw new Error('알 수 없는 요청');
 }
@@ -1080,7 +1092,7 @@ function normalize(it){
     shapes:(Array.isArray(shapes)?shapes:[]).map(cleanShape).filter(Boolean),
     tags:(Array.isArray(tags)?tags:[]).map(String).filter(t=>/^#[\w가-힣_]{1,20}$/.test(t)).slice(0,6),
     likes:+it.likes||0,hidden:it.hidden===true||it.hidden==='TRUE'||it.hidden==='true',pinned:it.pinned===true||it.pinned==='TRUE'||it.pinned==='true',
-    comments:(Array.isArray(comments)?comments:[]).map(c=>({id:String(c.id||''),nickname:String(c.nickname||''),text:String(c.text||''),at:c.at})),
+    comments:(Array.isArray(comments)?comments:[]).map(c=>({id:String(c.id||''),nickname:String(c.nickname||''),text:String(c.text||''),at:c.at,edited:!!c.edited})),
     createdAt:typeof it.createdAt==='number'?it.createdAt:Date.parse(it.createdAt)||0,hasPin:!!it.hasPin};
 }
 
@@ -1119,7 +1131,7 @@ $('#btn-logout').onclick=function(){
   }
   delete this.dataset.armed;this.textContent='로그아웃';
   S.cls='';S.nick='';S.shapes=[];S.hist=[];S.fut=[];S.sel=null;S.editing=null;S.bgChosen=false;S.bg='#f4efe2';
-  store.del('louvre_me');store.del('louvre_draft');if(S.admin)logoutTeacher();S.items=[];
+  store.del('louvre_me');store.del('louvre_draft');store.del('louvre_ck');store.del('louvre_mycmts');if(S.admin)logoutTeacher();S.items=[];
   $('#in-nick').value='';updateWho();closeModal();go('intro');focusLogin();toast('로그아웃했어요. 다음 화가님, 반과 닉네임을 정해 주세요.');
 };
 
@@ -1557,7 +1569,7 @@ function openDetail(id){
         <div class="tags">${tagBtns(it.tags,'dt','#dt-art svg',it.shapes)}</div>
         <div class="mini-stats">${[['균형',a.balance],['동세',a.move],['리듬',a.rhythm],['대비',a.contrast]].map(([k,v])=>`<div><b>${v}</b><span>${k}</span></div>`).join('')}</div>
         <div class="row"><button class="btn like${S.liked.has(it.id)?' on':''}" id="dt-like">${ICON.heart}<span>좋아요 ${it.likes}</span></button></div>
-        <div class="box"><h3>한 줄 감상평 ${it.comments.length}</h3>
+        <div class="box"><h3>한 줄 감상평 <span id="dt-ccount">${it.comments.length}</span></h3>
           <div class="comments" id="dt-cmts"></div>
           ${S.nick?`<form class="cmt-form" id="dt-cform" autocomplete="off" style="margin-top:8px"><input class="input" id="dt-ctext" maxlength="40" placeholder="${esc(S.nick)}(으)로 감상평 남기기 (40자)"><button class="btn" type="submit">남기기</button></form>`
           :`<p class="hint">작업실에 입장(반·닉네임)하면 감상평을 남길 수 있어요.</p>`}
@@ -1570,7 +1582,11 @@ function openDetail(id){
       </div>
     </div>`);
   const renderCmts=()=>{
-    $('#dt-cmts').innerHTML=it.comments.length?it.comments.map(c=>`<div class="cmt"><b>${esc(c.nickname)}</b><p>${esc(c.text)}</p>${S.admin?`<button class="btn btn-ghost btn-sm" data-dc="${esc(c.id)}" aria-label="감상평 삭제">✕</button>`:''}</div>`).join(''):'<p class="hint" style="margin:0">첫 감상평을 남겨 주세요.</p>';
+    const mine=myCmts();$('#dt-ccount').textContent=it.comments.length;
+    $('#dt-cmts').innerHTML=it.comments.length?it.comments.map(c=>{const m=mine.has(c.id);
+      return `<div class="cmt" data-cid="${esc(c.id)}"><b>${esc(c.nickname)}${m?'<span class="mine-tag">내 글</span>':''}</b><p>${esc(c.text)}${c.edited?' <small style="color:var(--dim)">(수정됨)</small>':''}</p>
+        <span class="cmt-act">${m?`<button class="btn btn-ghost" data-ce="${esc(c.id)}">수정</button><button class="btn btn-ghost" data-cd="${esc(c.id)}">삭제</button>`:''}${S.admin&&!m?`<button class="btn btn-ghost" data-dc="${esc(c.id)}" aria-label="감상평 삭제(교사)">✕</button>`:''}</span></div>`}).join('')
+      :'<p class="hint" style="margin:0">첫 감상평을 남겨 주세요.</p>';
   };
   renderCmts();
   $('#dt-like').onclick=async()=>{
@@ -1582,9 +1598,21 @@ function openDetail(id){
   if(cf)cf.onsubmit=async e=>{
     e.preventDefault();const text=$('#dt-ctext').value.trim();if(!text)return;
     if(hasBad(text)){toast('친구가 기분 좋게 읽을 수 있는 말로 바꿔 주세요.');return}
-    try{const r=await api('comment',{id:it.id,nickname:S.nick,text});it.comments=normalize({...it,comments:r.comments}).comments;$('#dt-ctext').value='';renderCmts();renderGallery()}catch(e){toast(e.message)}
+    try{const r=await api('comment',{id:it.id,nickname:S.nick,text,ck:deviceKey()});if(r.cid)addMyCmt(r.cid);it.comments=normalize({...it,comments:r.comments}).comments;$('#dt-ctext').value='';renderCmts();renderGallery()}catch(e){toast(e.message)}
   };
+  const setC=r=>{it.comments=normalize({...it,comments:r.comments}).comments;renderCmts();renderGallery()};
   $('#dt-cmts').addEventListener('click',async e=>{
+    const ce=e.target.closest('[data-ce]'),cd=e.target.closest('[data-cd]'),sv=e.target.closest('[data-save]'),cc=e.target.closest('[data-cancel]');
+    if(ce){const row=ce.closest('.cmt'),c=it.comments.find(x=>x.id===ce.dataset.ce);
+      row.innerHTML=`<b>${esc(c.nickname)}</b><form class="cmt-edit" data-save="${esc(c.id)}"><input class="input" maxlength="40" value="${esc(c.text)}" aria-label="감상평 고치기"><button class="btn btn-sm" type="submit">저장</button><button class="btn btn-ghost btn-sm" type="button" data-cancel>취소</button></form>`;
+      const inp=row.querySelector('input');inp.focus();inp.setSelectionRange(inp.value.length,inp.value.length);
+      row.querySelector('form').onsubmit=async ev=>{ev.preventDefault();const text=inp.value.trim();if(!text)return;
+        if(hasBad(text)){toast('친구가 기분 좋게 읽을 수 있는 말로 바꿔 주세요.');return}
+        try{setC(await api('editComment',{id:it.id,cid:c.id,ck:deviceKey(),text}));toast('감상평을 고쳤어요.')}catch(ex){toast(ex.message)}};
+      return}
+    if(cc){renderCmts();return}
+    if(cd){if(!cd.dataset.armed){cd.dataset.armed=1;cd.textContent='정말 삭제?';setTimeout(()=>{if(cd.isConnected){delete cd.dataset.armed;cd.textContent='삭제'}},3000);return}
+      try{setC(await api('deleteComment',{id:it.id,cid:cd.dataset.cd,ck:deviceKey()}));toast('감상평을 지웠어요.')}catch(ex){toast(ex.message)}return}
     const b=e.target.closest('[data-dc]');if(!b)return;
     try{const r=await api('adminDeleteComment',{tpin:S.admin,id:it.id,cid:b.dataset.dc});it.comments=normalize({...it,comments:r.comments}).comments;renderCmts();renderGallery()}catch(e){toast(e.message)}
   });
