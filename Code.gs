@@ -27,8 +27,9 @@ function handle_(r) {
   const a = r.action;
 
   // ---- 읽기 ----
-  if (a === 'list') {
-    return { ok: true, items: readAll_().filter(x => !x.hidden && (!r.cls || x.cls === r.cls)).map(pub_) };
+  if (a === 'list') {   // 학생은 자기 반 작품만 (반 이름 필수)
+    if (!r.cls) throw new Error('invalid');
+    return { ok: true, items: readAll_().filter(x => !x.hidden && x.cls === String(r.cls)).map(pub_) };
   }
   if (a === 'adminLogin') { checkTeacher_(r); return { ok: true }; }
   if (a === 'adminList')  { checkTeacher_(r); return { ok: true, items: readAll_().map(pub_) }; }

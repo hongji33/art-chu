@@ -305,6 +305,11 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 .shape.hl .sh-in{transform-box:fill-box;transform-origin:center;animation:wiggle .45s ease-in-out 4;filter:drop-shadow(0 0 7px rgba(236,209,138,.95))}
 @keyframes wiggle{0%,100%{transform:rotate(0) scale(1)}25%{transform:rotate(-4deg) scale(1.07)}75%{transform:rotate(4deg) scale(1.07)}}
 
+#login-form{border-radius:12px;transition:box-shadow .3s;padding:12px;margin:0 -12px}
+#login-form.flash{animation:formflash 1.6s ease 2}
+@keyframes formflash{0%,100%{box-shadow:0 0 0 0 rgba(236,209,138,0)}40%{box-shadow:0 0 0 6px rgba(236,209,138,.55)}}
+.login-title{font-family:var(--f-display);color:var(--gold-hi);font-size:16px;margin:0 0 8px}
+
 /* ---------- 추상화 배우기 ---------- */
 .learn{padding-bottom:60px}
 .lgrid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
@@ -375,6 +380,7 @@ table.cmp{min-width:540px}
 }
 @media (max-width:860px){
   .intro{grid-template-columns:1fr;gap:20px;padding-block:24px 40px}
+  .intro .case{order:-1}
   .frame{width:min(100%,330px)}
   .detail,.submit-grid,.admin-grid{grid-template-columns:1fr}
   .present{grid-template-columns:1fr;overflow:auto;align-content:start}
@@ -439,6 +445,7 @@ table.cmp{min-width:540px}
         <div><b>리듬</b><span>반복으로 흐름 만들기</span></div>
       </div>
       <form id="login-form" autocomplete="off">
+        <p class="login-title">입장하기: 우리 반을 고르고 닉네임을 쓰세요</p>
         <div class="form-row">
           <div class="field"><label for="in-cls">우리 반</label><select id="in-cls" class="input"></select></div>
           <div class="field"><label for="in-nick">작가 닉네임</label><input id="in-nick" class="input" maxlength="12" placeholder="예: 피카소2세, 선과면의마술사"></div>
@@ -447,7 +454,7 @@ table.cmp{min-width:540px}
         <p class="err" id="login-err"></p>
         <button class="btn btn-gold enter" type="submit">신진 화가로 입장하기</button>
       </form>
-      <div class="teacher-link"><button class="btn btn-ghost btn-sm" data-go="learn">먼저 추상화 배우기 →</button> <button class="btn btn-ghost btn-sm" data-go="gallery">갤러리 구경하기 →</button></div>
+      <div class="teacher-link"><button class="btn btn-ghost btn-sm" data-go="learn">먼저 추상화 배우기 →</button></div>
     </div>
   </div>
 </section>
@@ -623,7 +630,7 @@ table.cmp{min-width:540px}
 const CONFIG = {
   API_URL: 'https://script.google.com/macros/s/AKfycbyl43chG0FXti5fRaNuBh_QevASnheOKJRyi7_bQXyujwp5NLjaM9XCV79JldBTLS0o/exec',            // 예: 'https://script.google.com/macros/s/XXXX/exec'
   GRADE: '3학년',          // 학년 표시
-  CLASSES: 10,            // 반 수 (1반 ~ 10반)
+  CLASSES: 10,            // 반 수 (1반 ~ N반)
   DEMO_TEACHER_PIN: '1234'// 체험 모드 교사 비밀번호 (실제 비밀번호는 Apps Script 코드에서 설정)
 };
 
@@ -1049,7 +1056,7 @@ function demoApi(a,d){
   const T=()=>{if(d.tpin!==CONFIG.DEMO_TEACHER_PIN)throw new Error(ERR.wrong_pin)};
   const it=d.id?find(d.id):null;
   switch(a){
-    case 'list':return {ok:true,items:db.filter(x=>!x.hidden&&(!d.cls||x.cls===d.cls)).map(pub)};
+    case 'list':return {ok:true,items:db.filter(x=>!x.hidden&&d.cls&&x.cls===d.cls).map(pub)};
     case 'adminLogin':T();return {ok:true};
     case 'adminList':T();return {ok:true,items:db.map(pub)};
     case 'submit':{const o={id:'w'+Date.now().toString(36)+uid(),createdAt:Date.now(),updatedAt:Date.now(),cls:d.cls,nickname:d.nickname,title:d.title,note:d.note||'',pin:d.pin||'',shapes:d.shapes,tags:d.tags,likes:0,hidden:false,pinned:false,comments:[]};db.push(o);save();return {ok:true,item:pub(o)}}
@@ -1081,7 +1088,9 @@ function normalize(it){
    화면 이동
    ===================================================================== */
 function go(name){
-  if(name==='studio'&&!S.nick){name='intro';toast('먼저 반과 닉네임을 정해 주세요.')}
+  let needLogin=false;
+  if(name==='studio'&&!S.nick){name='intro';toast('먼저 반과 닉네임을 정해 주세요.');needLogin=true}
+  if(name==='gallery'&&!S.nick&&!S.admin){name='intro';toast('반과 닉네임으로 입장하면 우리 반 갤러리를 볼 수 있어요.');needLogin=true}
   if(name==='admin'&&!S.admin){openTeacherLogin();return}
   $$('.screen').forEach(s=>s.hidden=s.id!=='screen-'+name);
   $$('.nav [data-go]').forEach(b=>b.setAttribute('aria-current',b.dataset.go===name?'page':'false'));
@@ -1091,6 +1100,7 @@ function go(name){
   if(name==='studio'){renderAll();if(!S.shapes.length&&!S.bgChosen)setTimeout(openBgPicker,50)}
   if(name==='learn')renderLearn();
   window.scrollTo(0,0);
+  if(needLogin)focusLogin();
 }
 document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b){e.preventDefault();go(b.dataset.go)}});
 function updateWho(){
@@ -1109,9 +1119,14 @@ $('#btn-logout').onclick=function(){
   }
   delete this.dataset.armed;this.textContent='로그아웃';
   S.cls='';S.nick='';S.shapes=[];S.hist=[];S.fut=[];S.sel=null;S.editing=null;S.bgChosen=false;S.bg='#f4efe2';
-  store.del('louvre_me');store.del('louvre_draft');
-  $('#in-nick').value='';updateWho();closeModal();go('intro');toast('로그아웃했어요. 다음 화가님, 반과 닉네임을 정해 주세요.');
+  store.del('louvre_me');store.del('louvre_draft');if(S.admin)logoutTeacher();S.items=[];
+  $('#in-nick').value='';updateWho();closeModal();go('intro');focusLogin();toast('로그아웃했어요. 다음 화가님, 반과 닉네임을 정해 주세요.');
 };
+
+function focusLogin(){
+  const f=$('#login-form');setTimeout(()=>{f.scrollIntoView({behavior:'smooth',block:'center'});$('#in-nick').focus({preventScroll:true});
+    f.classList.remove('flash');void f.offsetWidth;f.classList.add('flash')},120);
+}
 
 /* ---------- 1단계: 접속 ---------- */
 (function initLogin(){
@@ -1127,6 +1142,7 @@ $('#btn-logout').onclick=function(){
     if(/^\d+$/.test(nick)||/\d{4,}/.test(nick)){err.textContent='번호처럼 보이는 닉네임은 쓸 수 없어요.';return}
     if(hasBad(nick)){err.textContent='전시실에 어울리는 닉네임으로 바꿔 주세요.';return}
     err.textContent='';
+    if(S.admin){logoutTeacher();S.items=[]}
     S.cls=sel.value;S.nick=nick;store.set('louvre_me',{cls:S.cls,nick:S.nick});
     S.gCls=S.cls;updateWho();go('studio');
   });
@@ -1490,10 +1506,10 @@ function showDone(shapes,title,id,bg){
    ===================================================================== */
 let galTimer=null;
 async function loadGallery(quiet){
-  if(!S.gCls)S.gCls=S.cls||CLASS_LIST[0];
+  if(!S.admin)S.gCls=S.cls;else if(!S.gCls)S.gCls=S.cls||CLASS_LIST[0];
   if(!quiet&&!S.items.length)$('#gal-grid').innerHTML='<div class="empty">전시실 조명을 켜는 중…</div>';
   try{
-    const res=S.admin?await api('adminList',{tpin:S.admin}):await api('list',{cls:S.gCls==='전체'?'':S.gCls});
+    const res=S.admin?await api('adminList',{tpin:S.admin}):await api('list',{cls:S.cls});
     S.items=res.items.map(normalize);renderGallery();
   }catch(e){
     if(S.admin&&/비밀번호/.test(e.message)){logoutTeacher();return loadGallery()}
@@ -1507,9 +1523,9 @@ function sortItems(list,mode){
 }
 function renderGallery(){
   const counts={};S.items.forEach(i=>counts[i.cls]=(counts[i.cls]||0)+1);
-  $('#tabs').innerHTML=[...CLASS_LIST,'전체'].map(c=>`<button class="tab" role="tab" data-cls="${c}" aria-selected="${S.gCls===c}">${c==='전체'?'전체 전시실':esc(c)+' 갤러리'}${(S.admin||S.gCls===c)?`<span class="c">${c==='전체'?S.items.length:(counts[c]||0)}</span>`:''}</button>`).join('');
+  $('#tabs').innerHTML=(S.admin?[...CLASS_LIST,'전체']:[S.cls]).map(c=>`<button class="tab" role="tab" data-cls="${c}" aria-selected="${S.gCls===c}">${c==='전체'?'전체 전시실':esc(c)+' 갤러리'}${(S.admin||S.gCls===c)?`<span class="c">${c==='전체'?S.items.length:(counts[c]||0)}</span>`:''}</button>`).join('');
   const list=sortItems(S.items.filter(i=>S.gCls==='전체'||i.cls===S.gCls),$('#gal-sort').value);
-  $('#gal-sub').textContent=`${CONFIG.GRADE} ${S.gCls==='전체'?'전체':S.gCls} · 작품 ${list.length}점`+(S.admin?' · 교사 모드(비공개 작품도 보임)':'');
+  $('#gal-sub').textContent=`${CONFIG.GRADE} ${S.gCls==='전체'?'전체':S.gCls} · 작품 ${list.length}점`+(S.admin?' · 교사 모드: 모든 반 보기 · 비공개 작품도 보임':' · 우리 반 친구들의 작품만 보여요');
   $('#gal-grid').innerHTML=list.length?list.map(cardHTML).join(''):
     `<div class="empty"><b>아직 걸린 작품이 없어요</b>${S.nick?'작업실에서 첫 작품을 완성해 전시실을 채워 주세요.':'작업실에 입장해 첫 작품을 걸어 보세요.'}</div>`;
 }
@@ -1522,7 +1538,7 @@ function cardHTML(it){
       <div class="foot"><span style="color:${S.liked.has(it.id)?'#c0362c':'inherit'}">${ICON.heart}${it.likes}</span><span>${ICON.chat}${it.comments.length}</span></div>
     </div></button>`;
 }
-$('#tabs').addEventListener('click',e=>{const t=e.target.closest('[data-cls]');if(t){S.gCls=t.dataset.cls;if(S.admin)renderGallery();else{S.items=[];renderGallery();loadGallery()}}});
+$('#tabs').addEventListener('click',e=>{const t=e.target.closest('[data-cls]');if(t&&S.admin){S.gCls=t.dataset.cls;renderGallery()}});
 $('#gal-sort').onchange=renderGallery;
 $('#b-refresh').onclick=()=>loadGallery();
 $('#gal-grid').addEventListener('click',e=>{const c=e.target.closest('.card');if(c)openDetail(c.dataset.id)});
@@ -1962,7 +1978,7 @@ $('#lbody').addEventListener('click',e=>{
   const t=e.target;
   const l2=t.closest('[data-l2]');if(l2){L.tab=l2.dataset.l2;renderLearn();window.scrollTo(0,0);return}
   if(t.id==='l-regen'){L.seedC++;L.seedH++;renderLearn();return}
-  if(t.id==='l-brush'){setMode('brush');if(!S.nick){toast('먼저 반과 닉네임을 정해 주세요.');go('intro')}else go('studio');return}
+  if(t.id==='l-brush'){setMode('brush');go('studio');return}
   const ga=t.closest('[data-ga]');
   if(ga&&!L.G.answered){const G=L.G,ok=(ga.dataset.ga==='hot')===G.cur.hot;G.answered=true;if(ok)G.score++;
     $$('[data-ga]').forEach(b=>b.disabled=true);
